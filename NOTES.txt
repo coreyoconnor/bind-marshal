@@ -1,0 +1,66 @@
+A Haskell EDSL for distributed processing.
+
+Uses a EDSL like xml-streamextract to describe processing pipelines.
+Can perform process migration by serializing the state of a process at given points and distributing
+the serialized state info a process executable across a graph of instances.
+
+Process migration system should utilize the same framework except without any functionality that
+relies on the automatic process migration system.
+
+Use STM for *all* IO:
+    - tag STM operations with the characteristics of the required IO. 
+    - Associate with the STM operations to an implementation of the required IO interface.
+    - The implementations of the required IO interface correspond to operations for each level in
+      the memory hierarchy:
+        - registers
+        - cache
+        - ram
+        - local storage
+        - network storage
+        - global storage
+      Due to technical limitations only the following hierarchy will be considered:
+        - ram
+        - local storage
+      Then
+        - ram
+        - local storage
+        - network storage
+        - global storage
+      Compiler support is likely required to even consider registers and cache under this
+      abstraction.
+
+Construct the accessors for the data type at runtime from the runtime declared structure?
+    - high performance of the produced accessors
+    - The required implementation of the accessor can not be determined until runtime.
+        - serialization properties
+        - linear access properties
+        - random access properties
+
+This is turning into a distributed object system. Which is fine but now I need to revisit what
+requirements are going to be satisfied and how.
+- data marshalling
+    - Multiple source and destinations supported:
+        - streams
+            - network
+        - Random-access
+            - RAM
+            - file
+- object system
+    - data marshalling for instances
+    - bind properties to objects
+        - Supports inter-property binding
+- data management
+    - transactional
+    - can query object graph for instances satisfying properties
+        - might be required to implement map/reduce
+    - map/reduce
+    
+I would like these features to be incrementally usable by a client in the following feature sets:
+    - data serialization
+    - data deserialization
+    - object marshalling
+    - object system
+        - transactional
+    - reactive layer implementation
+    - map/reduce
+

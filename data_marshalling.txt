@@ -1,0 +1,45 @@
+Encodes the structure of the data serialized as a type. Implementation actually executing the
+serialization process statically optimized according to the structure.
+
+Likewise for data marshalling.
+
+An example optimization would be to optimize the use of cache buffers:
+    - size
+    - when the buffer is checked for exhaustion and refilled or flushed.
+
+The backing store may depend on properties not known until runtime. However the set of backing
+stores is very small. The implementations for all possible backing stores is generated at compile
+time. 
+
+this should support:
+    - creation of code equivalent to memcpy marshalling code if that code is provably safe.
+
+The data marshalling code is partitioned into deserialization and serialization actions.
+these are monads:
+    SerAction - serialize action
+        put :: CanMarshall t => t -> SerAction ()
+    DesAction - deserialize action
+        get :: CanMarshall t => DesAction t
+
+usage examples
+    DesAction
+        data FLVHeader = FLVHeader
+            { version :: UInt8
+            , has_audio :: Bool
+            , has_video :: Bool
+            , header_size :: UInt32
+            }
+
+        read_header = do
+            version <- des uint8_t
+            flags <- des uint8_t
+            let ( has_audio, has_video ) = case flags of
+                                                1 -> ( True, False )
+                                                4 -> ( False, True )
+                                                5 -> ( True, True )
+            header_size <- des uint32_t
+            return $ FLVHeader version has_audio has_video header_size
+
+Benchmark cases:
+    - scan media container to compute a metric
+        - C++ iostream

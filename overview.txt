@@ -1,0 +1,9 @@
+spider-proc
+    - high performance data marshalling
+    - reactive object system
+    - distributed
+
+The data marshalling uses type level properties about the data to optimize how the data is
+deserialized and serialized on various backing stores.
+
+

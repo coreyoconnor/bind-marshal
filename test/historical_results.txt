@@ -1,0 +1,132 @@
+-- Copyright   :  (C) 2009 Corey O'Connor
+-- License     :  BSD-style (see the file LICENSE)
+
+verify_action 
+verify_action_base 
+verify_action_dynamic 
+verify_action_static 
+verify_bind_rules_proto 
+verify_bind_rules_proto_2 
+verify_data_model 
+verify_data_model_proto 
+verify_data_model_static 
+verify_desaction 
+verify_desaction_base 
+verify_desaction_dynamic 
+verify_desaction_static 
+verify_desaction_static_byte_size 
+(compile) verify_desaction_static_byte_size_loops 
+verify_desaction_static_fixed_buffer 
+verify_desaction_static_fixed_buffer_perf 
+    proposed faster's:
+    mean = 3.276361 s
+    variance = 678.7797 us
+    proposed slower's:
+    mean = 343.6440 ms
+    variance = 31.37535 us
+(run) verify_desaction_static_loops 
+verify_heap 
+verify_marshal 
+(compile) verify_monad_class_parametricity 
+verify_ser_base 
+verify_seraction 
+(compile) verify_seraction_dynamic 
+verify_seraction_static 
+verify_seraction_static_byte_size 
+verify_seraction_static_fixed_buffer 
+verify_seraction_static_fixed_buffer_perf 
+    proposed faster's:
+    mean = 2.332507 s
+    variance = 430.7545 us
+    proposed slower's:
+    mean = 369.0653 ms
+    variance = 42.64844 us
+(compile) verify_seraction_static_loops 
+verify_static_properties 
+verify_static_properties_desaction 
+verify_static_properties_seraction 
+verify_stdlib 
+verify_type_prelude 
+Passed 29 out of 34
+
+----------------------------------------------------------------------------------------------------
+verify_action 
+verify_action_base 
+verify_action_dynamic 
+verify_action_static 
+verify_data_model 
+verify_data_model_proto 
+verify_data_model_static 
+verify_desaction 
+verify_desaction_base 
+(compile) verify_desaction_dynamic 
+verify_desaction_static 
+verify_desaction_static_byte_size 
+(compile) verify_desaction_static_byte_size_loops 
+verify_desaction_static_fixed_buffer 
+verify_desaction_static_fixed_buffer_perf 
+(run) verify_desaction_static_loops 
+verify_heap 
+verify_marshal 
+verify_ser_base 
+verify_seraction 
+(compile) verify_seraction_dynamic 
+verify_seraction_static 
+verify_seraction_static_byte_size 
+verify_seraction_static_fixed_buffer 
+verify_seraction_static_fixed_buffer_perf 
+(compile) verify_seraction_static_loops 
+verify_static_properties 
+verify_static_properties_desaction 
+verify_static_properties_seraction 
+verify_stdlib 
+verify_type_prelude 
+Passed 26 out of 31
+
+----------------------------------------------------------------------
+verify_action 
+verify_action_base 
+verify_action_dynamic 
+verify_action_static 
+verify_data_model 
+verify_data_model_proto 
+verify_data_model_static 
+verify_des_base 
+verify_des_loops 
+verify_desaction 
+verify_desaction_dynamic 
+verify_desaction_static 
+verify_desaction_static_byte_size 
+(compile) verify_desaction_static_byte_size_loops 
+verify_desaction_static_fixed_buffer 
+verify_desaction_static_fixed_buffer_perf 
+    proposed faster's:
+    mean = 3.167474 s
+    variance = 669.5549 us
+    proposed slower's:
+    mean = 343.0268 ms
+    variance = 29.80783 us
+(run) verify_desaction_static_loops 
+verify_heap 
+verify_marshal 
+verify_ser_base 
+verify_seraction 
+(compile) verify_seraction_dynamic 
+verify_seraction_static 
+verify_seraction_static_byte_size 
+verify_seraction_static_fixed_buffer 
+verify_seraction_static_fixed_buffer_perf 
+    proposed faster's:
+    mean = 2.522858 s
+    variance = 8.602219 ms
+    proposed slower's:
+    mean = 364.4120 ms
+    variance = 2.365047 us
+(compile) verify_seraction_static_loops 
+verify_static_properties 
+verify_static_properties_desaction 
+verify_static_properties_seraction 
+verify_stdlib 
+verify_type_prelude 
+Passed 28 out of 32
+

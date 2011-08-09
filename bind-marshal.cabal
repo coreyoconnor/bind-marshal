@@ -1,0 +1,33 @@
+-- Copyright   :  (C) 2009 Corey O'Connor
+-- License     :  BSD-style (see the file LICENSE)
+
+name:               bind-marshal
+version:            0.1
+build-depends:      base == 4.*,
+                    unix,
+                    numeric-prelude,
+                    monad-param == 0.0.2.1,
+                    monads-tf
+build-type:         Custom
+exposed-modules:    SpiderProc
+                    SpiderProc.Prelude
+hs-source-dirs:     src
+extensions:         TypeFamilies
+                    CPP
+                    ForeignFunctionInterface
+                    ScopedTypeVariables
+                    NoImplicitPrelude
+                    NamedFieldPuns
+                    UndecidableInstances
+                    IncoherentInstances
+                    TypeSynonymInstances
+                    FlexibleInstances
+                    FlexibleContexts
+                    MultiParamTypeClasses
+                    PackageImports
+                    RankNTypes
+                    NoMonomorphismRestriction
+                    LiberalTypeSynonyms
+                    EmptyDataDecls
+                    GADTs
+                    KindSignatures
