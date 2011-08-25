@@ -1,0 +1,62 @@
+bind-marshal
+
+A (in development) high performance data marshaling layer for haskell. Uses a pair of parameterized
+monads to represent: Data marshalling actions with static buffering requirements (EG: Needs no more
+than 100 bytes available to succeed) ; Data marshalling actions with a dynamic composition of
+actions with static buffering requirements.
+
+Currently bind-marshal can only be used via dev-system. A build/run/test dev tool I have not
+currently released. Sorry!
+
+The static buffering actions parameterize a monad with the maximum number of bytes that will either
+be read/written from/to a buffer. A type level number is used to represent the maximum number of
+bytes. 
+
+For example, this expression represents a serialization action that writes at most 8 bytes in host
+endian order:
+
+foo :: StaticSerAction D8 () -- D8 is the type level representation of 8
+foo = do
+    ser (256 :: Word32) -- ser for serialize
+    ser (13 :: Word32)
+    static_return ()
+
+A more complex example would be:
+bar :: StaticSerAction D16 ()
+bar = do
+    _ <- foo
+    _ <- foo
+    static_return ()
+
+A note on syntax: The "static_return" is equivalent to "return" except it plays nicely with the
+mechanism that infers the buffer requirements. Actually, due to the use of parameterized monads
+"return" cannot be used. Instead "returnM" must be used which properly interacts with the
+parameterized monad machinery. So a more accurate statement would be that "static_return" is
+equivalent to "returnM".
+
+Static actions are useful for basic structures. However, most structures contain components whose
+marshalled size are dynamic; Not known at compile time. 
+
+Bind-marshal represents these cases with the the Dynamic actions: DynamicSerAction,
+DynamicDesAction. Which are actions composed of individual static actions. Where before each static
+action is a check that assures the buffer satisfies the requirements of the static action. 
+
+For example, the following action:
+
+pew i = do 
+    replicateM i $ dyn_action $ do      
+        x :: Word32 <- des              
+        y :: Word32 <- des              
+        static_return ()
+
+Is evaluated (more or less) like so:
+    0. For i times
+        a. Verify there is at least 8 bytes available to read
+        b. Read 4 bytes
+        c. Read 4 bytes
+
+
+Currently a "dyn_action" is required to "lift" a static action into a dynamic action monad. This
+should be automatic, but I have thus failed to get automatic lifting to work as a user expects. In
+the currently implementation: If the dyn_action is ommited the equation will fail to type check. 
+
