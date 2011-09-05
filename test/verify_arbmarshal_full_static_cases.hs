@@ -71,11 +71,11 @@ import qualified TestCases.BinaryCase19 as BinaryCase19
 #endif
 
 main = run_test $ do
-#if 0
     verify1 "case 0 deserialization vs rd binary" 
             ( verify_full_static_des_vs_rd_binary FullStaticCase0.static_structure 
                                                   FullStaticCase0.des_static_structure
             )
+#if 0
     verify1 "case 0 serialization vs rd binary" 
             ( verify_full_static_ser_vs_rd_binary FullStaticCase0.static_structure 
                                                   FullStaticCase0.ser_static_structure
