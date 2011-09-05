@@ -764,7 +764,6 @@ dyn_fail = fail
 -- finalize_region passes.
 class SealedDynAction (action :: * -> *) bd where
     type DynActionTag action
-    {-# INLINE dyn_action #-}
     dyn_action :: action a -> DynAction Sealed Sealed Sealed 
                                         bd
                                         (DynActionTag action) 

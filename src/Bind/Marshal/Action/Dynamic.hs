@@ -148,12 +148,10 @@ data family DynAction pre_req
 
 class BufferDelegate buffer_delegate where
     -- will not be invoked if max_bytes_avail > next static actions requirement
-    {-# INLINABLE gen_region #-}
     gen_region ::    Size -- Size is maximum size of buffer required by next static eval
                   -> buffer_delegate 
                   -> IO (BDIter buffer_delegate)
     -- will not be invoked if max_bytes_final is 0
-    {-# INLINABLE finalize_region #-}
     finalize_region ::    BDIter buffer_delegate 
                        -> IO buffer_delegate
 

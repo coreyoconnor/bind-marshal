@@ -6,5 +6,5 @@ where
 
 import Bind.Marshal.Prelude
 
-data Nat size => StaticModel size
+data StaticModel size
 
