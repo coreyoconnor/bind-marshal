@@ -32,11 +32,11 @@ ser :: forall t .
        , Nat (BufferReq t)
        ) => t 
          -> StaticSerAction (BufferReq t) ()
-ser !v = case toInt (undefined :: (BufferReq t)) of
+ser v = case toInt (undefined :: (BufferReq t)) of
     I# type_size -> StaticMemAction 
                     ( \ eval_cont _fail_cont !p -> do
-                        () <- serialize v p
-                        eval_cont () (plusAddr# p type_size)
+                        !i <- serialize v p
+                        eval_cont i (plusAddr# p type_size)
                     )
 
 -- | To execute a serialization action:

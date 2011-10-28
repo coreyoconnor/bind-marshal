@@ -19,7 +19,7 @@ import qualified Data.ByteString as S
 import qualified Data.ByteString.Internal as S
 import Data.IORef
 
-import Foreign ( unsafePerformIO )
+import System.IO.Unsafe ( unsafePerformIO )
 import Foreign.Marshal.Array
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
