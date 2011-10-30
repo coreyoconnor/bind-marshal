@@ -119,7 +119,6 @@ Library
                         TypeOperators
     ghc-options:        -fcontext-stack=1000
                         -fliberate-case-threshold=1000
-                        -threaded
                         -with-rtsopts=-K128M
                         -fspec-constr
                         -fliberate-case
