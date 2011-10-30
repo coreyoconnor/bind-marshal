@@ -4,6 +4,7 @@ name:               bind-marshal
 version:            0.1
 cabal-version:      >= 1.6
 author:             Corey O'Connor <coreyoconnor@gmail.com>
+maintainer:         Corey O'Connor <coreyoconnor@gmail.com>
 homepage:           https://github.com/coreyoconnor/bind-marshal
 category:           Data
 license:            BSD3
