@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
@@ -140,11 +141,25 @@ data Open n
 --
 -- A pre buffer action exists iff the type level pre buffer size requirement is Open n.
 -- A post buffer action exists iff the type level post buffer size requirement is Open n.
-data family DynAction pre_req 
-                      post_req_accumulator
-                      post_req     -- often shortened to pre_r post_ra post_r
-                      buffer_delegate
-                      :: * -> * -> *
+data family DynAction_ pre_req 
+                       post_req_accumulator
+                       post_req     -- often shortened to pre_r post_ra post_r
+                       buffer_delegate
+                       :: * -> * -> *
+
+-- | A dynamic action with the buffering requirements abstracted away.
+--
+-- Typically the user of this library is not concerned about the buffering requirements for dynamic
+-- actions. 
+type DynAction buffer_delegate tag a = forall pre_req 
+                                              post_req_accumulator
+                                              post_req .
+                                                DynAction_ pre_req
+                                                           post_req_accumulator
+                                                           post_req
+                                                           buffer_delegate
+                                                           tag
+                                                           a
 
 class BufferDelegate buffer_delegate where
     -- will not be invoked if max_bytes_avail > next static actions requirement
@@ -167,22 +182,22 @@ data BDIter bd = BDIter
 bytes_final :: BDIter bd -> Size
 bytes_final !bd_iter = I# (minusAddr# (curr_addr bd_iter) (start_addr bd_iter))
 
-newtype instance DynAction Sealed
-                        Sealed
-                        Sealed
-                        bd
-                        tag
-                        a =
+newtype instance DynAction_ Sealed
+                            Sealed
+                            Sealed
+                            bd
+                            tag
+                            a =
     SealedSealedAction ( forall b . ( a -> BDIter bd -> IO b)
                                     -> BDIter bd -> IO b
                        )
 
-data instance DynAction Sealed
-                        post_ra 
-                        (Open n)
-                        bd
-                        tag
-                        a 
+data instance DynAction_ Sealed
+                         post_ra 
+                         (Open n)
+                         bd
+                         tag
+                         a 
                     where
     SealedOpenAction :: forall post_ra a b n bd tag . BufferDelegate bd
                         => ( forall c d . ( a -> Iter -> IO (c, Iter) )
@@ -190,14 +205,14 @@ data instance DynAction Sealed
                              -> BDIter bd -> IO d
                            ) 
                         -> ( a -> Iter -> IO (b, Iter) )
-                        -> DynAction Sealed post_ra (Open n) bd tag b
+                        -> DynAction_ Sealed post_ra (Open n) bd tag b
 
-data instance DynAction (Open n)
-                        post_ra 
-                        Sealed
-                        bd
-                        tag
-                        a 
+data instance DynAction_ (Open n)
+                         post_ra 
+                         Sealed
+                         bd
+                         tag
+                         a 
                     where
     OpenSealedAction :: forall n post_ra bd tag a b . BufferDelegate bd
                         => ( Iter -> IO (a, Iter) )
@@ -205,14 +220,14 @@ data instance DynAction (Open n)
                              -> ( b -> BDIter bd -> IO c )
                              -> BDIter bd -> IO c
                            ) 
-                        -> DynAction (Open n) post_ra Sealed bd tag b
+                        -> DynAction_ (Open n) post_ra Sealed bd tag b
 
-data instance DynAction (Open n_0)
-                        post_ra 
-                        (Open n_1)
-                        bd
-                        tag
-                        a 
+data instance DynAction_ (Open n_0)
+                         post_ra 
+                         (Open n_1)
+                         bd
+                         tag
+                         a 
                     where
     OpenOpenAction :: forall post_ra n_0 n_1 tag bd a b e. BufferDelegate bd
                       => ( Iter -> IO (a, Iter) )
@@ -222,13 +237,13 @@ data instance DynAction (Open n_0)
                              -> BDIter bd -> IO d
                          ) 
                       -> ( b -> Iter -> IO (e, Iter ) )
-                      -> DynAction (Open n_0) post_ra (Open n_1) bd tag e
+                      -> DynAction_ (Open n_0) post_ra (Open n_1) bd tag e
 
-instance Functor (DynAction Sealed Sealed Sealed bd tag) where
+instance Functor (DynAction_ Sealed Sealed Sealed bd tag) where
     fmap f (SealedSealedAction a) 
         = SealedSealedAction ( \eval_cont -> a (\v -> eval_cont (f v)) ) 
 
-instance Functor (DynAction Sealed post_ra (Open n) bd tag) where
+instance Functor (DynAction_ Sealed post_ra (Open n) bd tag) where
     fmap (f :: b -> b') (SealedOpenAction ma post) 
         = SealedOpenAction ma
                            (\a !iter -> do
@@ -236,11 +251,11 @@ instance Functor (DynAction Sealed post_ra (Open n) bd tag) where
                             returnM (f b, iter') :: IO (b', Iter)
                            )
 
-instance Functor (DynAction (Open n) post_ra Sealed bd tag) where
+instance Functor (DynAction_ (Open n) post_ra Sealed bd tag) where
     fmap f (OpenSealedAction pre a) 
         = undefined
 
-instance Functor (DynAction (Open n_1) post_ra (Open n_0) bd tag) where
+instance Functor (DynAction_ (Open n_1) post_ra (Open n_0) bd tag) where
     fmap f (OpenOpenAction pre a post) 
         = undefined
 

@@ -31,7 +31,7 @@ import System.IO
 {-# INLINE ser_to_buffer_delegate_ #-}
 ser_to_buffer_delegate_ :: forall out_type buffer_delegate .
                             ( BufferDelegate buffer_delegate
-                            ) => DynamicSerAction Sealed Sealed Sealed buffer_delegate out_type
+                            ) => SealedDynamicSerAction buffer_delegate out_type
                               -> buffer_delegate
                               -> IO out_type
 ser_to_buffer_delegate_ (SealedSealedAction m) buffer_delegate = 
@@ -42,7 +42,7 @@ ser_to_buffer_delegate_ (SealedSealedAction m) buffer_delegate =
 {-# INLINE ser_to_buffer_delegate #-}
 ser_to_buffer_delegate :: forall out_type buffer_delegate .
                             ( BufferDelegate buffer_delegate
-                            ) => DynamicSerAction Sealed Sealed Sealed buffer_delegate out_type
+                            ) => SealedDynamicSerAction buffer_delegate out_type
                               -> buffer_delegate
                               -> IO (out_type, buffer_delegate)
 ser_to_buffer_delegate (SealedSealedAction m) buffer_delegate = 

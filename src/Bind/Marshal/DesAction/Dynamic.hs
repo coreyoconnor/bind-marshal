@@ -58,13 +58,13 @@ import System.IO
 {-# INLINE des_from_buffer_delegate_ #-}
 {-# SPECIALIZE INLINE des_from_buffer_delegate_ 
    :: forall out_type 
-      .  DynAction Sealed Sealed Sealed (FixedBufferDelegate DesTag) DesTag out_type
+      .  DynAction_ Sealed Sealed Sealed (FixedBufferDelegate DesTag) DesTag out_type
       -> FixedBufferDelegate DesTag
       -> IO out_type
   #-}
 des_from_buffer_delegate_ :: forall out_type buffer_delegate .
                             ( BufferDelegate buffer_delegate
-                            ) => DynamicDesAction Sealed Sealed Sealed buffer_delegate out_type
+                            ) => SealedDynamicDesAction buffer_delegate out_type
                               -> buffer_delegate
                               -> IO out_type
 des_from_buffer_delegate_ (SealedSealedAction a) buffer_delegate = 
@@ -75,13 +75,13 @@ des_from_buffer_delegate_ (SealedSealedAction a) buffer_delegate =
 {-# INLINE des_from_buffer_delegate #-}
 {-# SPECIALIZE INLINE des_from_buffer_delegate 
    :: forall out_type 
-      .  DynAction Sealed Sealed Sealed (FixedBufferDelegate DesTag) DesTag out_type
+      .  DynAction_ Sealed Sealed Sealed (FixedBufferDelegate DesTag) DesTag out_type
       -> FixedBufferDelegate DesTag
       -> IO (out_type, FixedBufferDelegate DesTag)
   #-}
 des_from_buffer_delegate :: forall out_type buffer_delegate .
                             ( BufferDelegate buffer_delegate
-                            ) => DynamicDesAction Sealed Sealed Sealed buffer_delegate out_type
+                            ) => SealedDynamicDesAction buffer_delegate out_type
                               -> buffer_delegate
                               -> IO (out_type, buffer_delegate)
 des_from_buffer_delegate (SealedSealedAction a) buffer_delegate = 

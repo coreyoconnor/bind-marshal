@@ -80,14 +80,14 @@ with_bytestring_handler bs_0 f = do
     returnM $! (v, out_bytestring bd') :: IO (a, L.ByteString)
 
 {-# NOINLINE encode_ #-}
-encode_ :: DynamicSerAction Sealed Sealed Sealed LazyBSSer () -> L.ByteString
+encode_ :: SealedDynamicSerAction LazyBSSer () -> L.ByteString
 encode_ !ser_action = unsafePerformIO ( do
     !( (), !bd') <- ser_to_buffer_delegate ser_action (LazyBSSer L.empty undefined)
     returnM $! out_bytestring bd' :: IO L.ByteString
     )
 
 {-# NOINLINE encode #-}
-encode :: DynamicSerAction Sealed Sealed Sealed LazyBSSer a -> (a, L.ByteString)
+encode :: SealedDynamicSerAction LazyBSSer a -> (a, L.ByteString)
 encode ser_action = unsafePerformIO (
     with_bytestring_handler L.empty (ser_to_buffer_delegate ser_action)
     )

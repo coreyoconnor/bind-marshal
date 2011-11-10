@@ -9,8 +9,8 @@ import Bind.Marshal.Action.Base
 import Bind.Marshal.Action.Dynamic
 import Bind.Marshal.SerAction.Base
 
--- A dynamic deserialization action...
-type DynamicSerAction pre_s post_sa post_s bd a = DynAction pre_s post_sa post_s bd SerTag a 
+-- | A dynamic serialization action produces bytes from a buffer delegate
+type DynamicSerAction bd a = DynAction bd SerTag a 
 
--- ...produces bytes from a buffer delegate
+type SealedDynamicSerAction bd a = DynAction_ Sealed Sealed Sealed bd SerTag a
 

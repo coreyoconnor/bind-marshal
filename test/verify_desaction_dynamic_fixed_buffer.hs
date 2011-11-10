@@ -35,7 +35,7 @@ t_0 i = do
         _ :: Word32 <- des
         static_return ()
 
-validate_t_0 :: BytePtr -> Test Result
+validate_t_0 :: BytePtr -> Test TestResult
 validate_t_0 buffer_0 = 
     verify "deserializes an arbitrary number of units" $ \ (Max1KBInt i) -> liftIOResult $ do
         validate_t_0_inner buffer_0 i
@@ -47,8 +47,7 @@ validate_t_0_inner buffer_0 i =  do
         des_buf = BufferRegion b (i * 4)
     des_buf_provider <- fixed_buffer des_buf
     vs <- des_from_buffer_delegate_ (dyn_action $! t_0 i) des_buf_provider
-    returnM $! rnf vs :: IO ()
-    returnM succeeded :: IO PropertyResult
+    deepseq vs $! returnM succeeded  :: IO PropertyResult
 
 t_1 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do

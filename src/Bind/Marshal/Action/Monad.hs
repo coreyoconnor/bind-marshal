@@ -30,7 +30,7 @@ import System.IO
 
 -- The return instance is only currently defined as a sealed action. 
 -- TODO: Add a more generic return instance.
-instance BufferDelegate bd => Return (DynAction Sealed Sealed Sealed bd tag) where
+instance BufferDelegate bd => Return (DynAction_ Sealed Sealed Sealed bd tag) where
     {-# INLINE returnM #-}
     returnM v = SealedSealedAction (\ eval_cont -> eval_cont v)
 
@@ -38,7 +38,7 @@ instance BufferDelegate bd => Return (DynAction Sealed Sealed Sealed bd tag) whe
 -- non-parameterized monad. I would like to be able to automatically lift any other DynamicDesAction
 -- via dyn_action when a non-parameterized monad is required, but I have been stymied attempting to
 -- do so.
-instance BufferDelegate bd => BaseMonad.Monad (DynAction Sealed Sealed Sealed bd tag) where
+instance BufferDelegate bd => BaseMonad.Monad (DynAction_ Sealed Sealed Sealed bd tag) where
     {-# INLINE return #-}
     return v = SealedSealedAction (\ eval_cont -> eval_cont v )
     {-# INLINE (>>=) #-}
@@ -166,9 +166,9 @@ instance ( bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , tag_2 ~ tag_0
          , tag_2 ~ tag_1
-         ) => Bind (DynAction Sealed Sealed Sealed bd_0 tag_0) 
-                   (DynAction Sealed Sealed Sealed bd_1 tag_1) 
-                   (DynAction Sealed Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ Sealed Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ Sealed Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedSealedAction ma) fmb = SealedSealedAction 
@@ -184,9 +184,9 @@ instance ( post_s_0  ~ post_sa_0
          , bd_2 ~ bd_1
          , tag_2 ~ tag_0
          , tag_2 ~ tag_1
-         ) => Bind (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction Sealed Sealed Sealed bd_1 tag_1) 
-                   (DynAction Sealed Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ Sealed Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ Sealed Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma post) fmb = SealedSealedAction 
@@ -202,9 +202,9 @@ instance ( pre_s_2   ~ pre_s_0
          , tag_2 ~ tag_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
-         ) => Bind (DynAction (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
-                   (DynAction Sealed Sealed Sealed bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ Sealed Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenSealedAction pre_accum ma) fmb = OpenSealedAction
@@ -223,9 +223,9 @@ instance ( pre_s_2   ~ pre_s_0
          , tag_2 ~ tag_1
          , bd_2 ~ bd_0 
          , bd_2 ~ bd_1 
-         ) => Bind (DynAction (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction Sealed Sealed Sealed bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ Sealed Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenOpenAction pre ma post) fmb = OpenSealedAction
@@ -246,8 +246,8 @@ instance ( pre_s_2 ~ static_size
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
          ) => Bind (StaticMemAction tag_0 static_size) 
-                   (DynAction Sealed Sealed Sealed bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) Sealed Sealed bd_2 tag_2)
+                   (DynAction_ Sealed Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (StaticMemAction ma) fmb = OpenSealedAction
@@ -266,9 +266,9 @@ instance ( post_sa_2 ~ post_sa_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed Sealed Sealed bd_0 tag_0) 
-                   (DynAction Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedSealedAction ma) fmb = SealedOpenAction
@@ -294,9 +294,9 @@ instance ( post_sa_2 ~ post_sa_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma ma_post) fmb = SealedOpenAction
@@ -320,9 +320,9 @@ instance ( pre_s_2   ~ pre_s_0
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
-                   (DynAction Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenSealedAction !pre !ma) !fmb = OpenOpenAction
@@ -349,9 +349,9 @@ instance ( pre_s_2   ~ pre_s_0
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenOpenAction ma_pre ma ma_post) fmb = OpenOpenAction
@@ -377,8 +377,8 @@ instance ( pre_s_2   ~ static_size
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
          ) => Bind (StaticMemAction tag_0 static_size) 
-                   (DynAction Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+                   (DynAction_ Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (StaticMemAction ma) fmb = OpenOpenAction
@@ -403,9 +403,9 @@ instance ( Nat pre_s_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed Sealed Sealed bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
-                   (DynAction Sealed Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ Sealed Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedSealedAction ma) fmb = case toInt (undefined :: pre_s_1) of
@@ -423,9 +423,9 @@ instance ( post_s_0  ~ Add post_sa_0 pre_s_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
-                   (DynAction Sealed Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ Sealed Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma post) fmb = SealedSealedAction
@@ -443,9 +443,9 @@ instance ( pre_s_2   ~ pre_s_0
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenSealedAction ma_pre ma) fmb = case toInt (undefined :: pre_s_1) of
@@ -467,9 +467,9 @@ instance ( pre_s_2   ~ pre_s_0
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) Sealed Sealed bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) Sealed Sealed bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenOpenAction ma_pre ma ma_post) fmb = OpenSealedAction
@@ -489,8 +489,8 @@ instance ( pre_s_2   ~ Add static_size pre_s_1
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
          ) => Bind (StaticMemAction tag_0 static_size) 
-                   (DynAction (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) Sealed Sealed bd_1 tag_1)
+                   (DynAction_ (Open pre_s_1) Sealed Sealed bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) Sealed Sealed bd_1 tag_1)
     where
     {-# INLINE (>>=) #-}
     (>>=) (StaticMemAction !ma) !fmb = OpenSealedAction
@@ -510,9 +510,9 @@ instance ( post_sa_2 ~ post_sa_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed Sealed Sealed bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedSealedAction ma) fmb = case toInt (undefined :: pre_s_1) of
@@ -539,9 +539,9 @@ instance ( post_sa_2 ~ post_sa_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma ma_post) fmb = SealedOpenAction
@@ -567,9 +567,9 @@ instance ( pre_s_2   ~ pre_s_0
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenSealedAction ma_pre ma) fmb = case toInt (undefined :: pre_s_1) of
@@ -599,9 +599,9 @@ instance ( pre_s_2   ~ pre_s_0
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
-                   (DynAction (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+         ) => Bind (DynAction_ (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+                   (DynAction_ (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenOpenAction ma_pre ma ma_post) fmb = OpenOpenAction
@@ -628,8 +628,8 @@ instance ( pre_s_2   ~ Add static_size pre_s_1
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
          ) => Bind (StaticMemAction tag_0 static_size) 
-                   (DynAction (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+                   (DynAction_ (Open pre_s_1) (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (StaticMemAction ma) fmb = OpenOpenAction
@@ -656,9 +656,9 @@ instance ( post_sa_2 ~ static_size
          , tag_2 ~ tag_1
          , bd_2 ~ bd_0 
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed Sealed Sealed bd_0 tag_0) 
+         ) => Bind (DynAction_ Sealed Sealed Sealed bd_0 tag_0) 
                    (StaticMemAction tag_1 static_size)
-                   (DynAction Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+                   (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedSealedAction ma) fmb = case toInt (undefined :: post_s_2) of
@@ -686,9 +686,9 @@ instance ( post_sa_2 ~ Add post_sa_0 static_size
          , tag_2 ~ tag_1
          , bd_2 ~ bd_0
          , BufferDelegate bd_2
-         ) => Bind (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+         ) => Bind (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
                    (StaticMemAction tag_1 static_size)
-                   (DynAction Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+                   (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma ma_post) fmb = SealedOpenAction
@@ -706,9 +706,9 @@ instance ( pre_s_2 ~ pre_s_0
          , tag_1 ~ tag_2
          , bd_2 ~ bd_0
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
+         ) => Bind (DynAction_ (Open pre_s_0) Sealed Sealed bd_0 tag_0) 
                    (StaticMemAction tag_1 static_size)
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenSealedAction ma_pre ma) fmb = case toInt ( undefined :: post_s_2 ) of
@@ -733,9 +733,9 @@ instance ( pre_s_2 ~ pre_s_0
          , tag_1 ~ tag_2
          , bd_2 ~ bd_0
          , BufferDelegate bd_2
-         ) => Bind (DynAction (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
+         ) => Bind (DynAction_ (Open pre_s_0) (Open post_sa_0) (Open post_s_0) bd_0 tag_0) 
                    (StaticMemAction tag_1 static_size)
-                   (DynAction (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
+                   (DynAction_ (Open pre_s_2) (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
     {-# INLINE (>>=) #-}
     (>>=) (OpenOpenAction ma_pre ma ma_post) fmb = OpenOpenAction
@@ -747,33 +747,33 @@ instance ( pre_s_2 ~ pre_s_0
         )
                 
 
-instance BufferDelegate bd => Fail (DynAction Sealed Sealed Sealed bd tag) where
+instance BufferDelegate bd => Fail (DynAction_ Sealed Sealed Sealed bd tag) where
     {-# INLINE fail #-}
     fail !err_txt = SealedSealedAction (\ eval_cont !bd_iter -> fail err_txt)
 
-instance BufferDelegate bd => Fail (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd tag) where
+instance BufferDelegate bd => Fail (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd tag) where
     {-# INLINE fail #-}
     fail !err_txt = SealedOpenAction (\ post eval_cont !bd_iter -> fail err_txt) (returnM_v_i)
 
 {-# INLINE dyn_fail #-}
 dyn_fail :: forall bd tag a . BufferDelegate bd 
-            => String -> DynAction Sealed Sealed Sealed bd tag a
+            => String -> DynAction_ Sealed Sealed Sealed bd tag a
 dyn_fail = fail
 
 -- | Converts an action to a sealed dynamic memory action value. Possibly inserts gen_region or
 -- finalize_region passes.
 class SealedDynAction (action :: * -> *) bd where
     type DynActionTag action
-    dyn_action :: action a -> DynAction Sealed Sealed Sealed 
-                                        bd
-                                        (DynActionTag action) 
-                                        a
+    dyn_action :: action a -> DynAction_ Sealed Sealed Sealed 
+                                         bd
+                                         (DynActionTag action) 
+                                         a
 
 
 instance ( bd_1 ~ bd_0
          , BufferDelegate bd_1
-         ) => SealedDynAction (DynAction Sealed Sealed Sealed bd_0 tag) bd_1 where
-    type DynActionTag (DynAction Sealed Sealed Sealed bd_0 tag) = tag
+         ) => SealedDynAction (DynAction_ Sealed Sealed Sealed bd_0 tag) bd_1 where
+    type DynActionTag (DynAction_ Sealed Sealed Sealed bd_0 tag) = tag
     {-# INLINE dyn_action #-}
     dyn_action (SealedSealedAction a) = SealedSealedAction a
 
@@ -799,8 +799,8 @@ instance ( BufferDelegate bd
 instance ( BufferDelegate bd_1
          , bd_0 ~ bd_1
          , Nat pre_s
-         ) => SealedDynAction (DynAction (Open pre_s) Sealed Sealed bd_0 tag) bd_1 where
-    type DynActionTag (DynAction (Open pre_s) Sealed Sealed bd_0 tag) = tag
+         ) => SealedDynAction (DynAction_ (Open pre_s) Sealed Sealed bd_0 tag) bd_1 where
+    type DynActionTag (DynAction_ (Open pre_s) Sealed Sealed bd_0 tag) = tag
     {-# INLINE dyn_action #-}
     dyn_action (OpenSealedAction pre m) = case toInt (undefined :: pre_s) of
         !required_size -> SealedSealedAction 
@@ -812,8 +812,8 @@ instance ( BufferDelegate bd_1
 instance ( BufferDelegate bd_1
          , bd_0 ~ bd_1
          , post_s_0 ~ post_sa_0
-         ) => SealedDynAction (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag) bd_1 where
-    type DynActionTag (DynAction Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag) = tag
+         ) => SealedDynAction (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag) bd_1 where
+    type DynActionTag (DynAction_ Sealed (Open post_sa_0) (Open post_s_0) bd_0 tag) = tag
     {-# INLINE dyn_action #-}
     dyn_action (SealedOpenAction m post) = SealedSealedAction (m post)
 
@@ -823,8 +823,8 @@ instance ( post_s ~ post_sa
          , Nat pre_s
          , BufferDelegate bd_0
          , bd_0 ~ bd_1
-         ) => SealedDynAction (DynAction (Open pre_s) (Open post_sa) (Open post_s) bd_0 tag) bd_1 where
-    type DynActionTag (DynAction (Open pre_s) (Open post_sa) (Open post_s) bd_0 tag) = tag
+         ) => SealedDynAction (DynAction_ (Open pre_s) (Open post_sa) (Open post_s) bd_0 tag) bd_1 where
+    type DynActionTag (DynAction_ (Open pre_s) (Open post_sa) (Open post_s) bd_0 tag) = tag
     {-# INLINE dyn_action #-}
     dyn_action (OpenOpenAction pre m post) = case toInt (undefined :: pre_s) of
         !required_size -> SealedSealedAction 
