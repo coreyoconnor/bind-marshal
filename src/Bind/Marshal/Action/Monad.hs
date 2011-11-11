@@ -28,8 +28,9 @@ import GHC.Exts
 
 import System.IO
 
--- The return instance is only currently defined as a sealed action. 
--- TODO: Add a more generic return instance.
+-- | The return instance is only currently defined as a sealed action. 
+--
+-- XXX Add a more generic return instance.
 instance BufferDelegate bd => Return (DynAction_ Sealed Sealed Sealed bd tag) where
     {-# INLINE returnM #-}
     returnM v = SealedSealedAction (\ eval_cont -> eval_cont v)
@@ -122,33 +123,35 @@ resolve_iter !required_size !bd_iter = case max_bytes_final bd_iter of
 -- ( pre = pre_open, post = post_open, fr = finalize_region, gr = gen_region )
 -- ( lhs type == static && rhs type == static is in Action.Monad.Static )
 --
--- case # | lhs type | lhs pre | lhs post | rhs type | rhs pre | rhs post | fr | gr |
--- ----------------------------------------------------------------------------------
---      1 | dyn      |         |          | dyn      |         |          |    |    |
---      2 | dyn      |         |    X     | dyn      |         |          |  X |    |
---      3 | dyn      |    X    |          | dyn      |         |          |    |    |
---      4 | dyn      |    X    |    X     | dyn      |         |          |  X |    |
---      5 | static   |         |          | dyn      |         |          |  X |    |
---      6 | dyn      |         |          | dyn      |         |    X     |    |    |
---      7 | dyn      |         |    X     | dyn      |         |    X     |  X |    |
---      8 | dyn      |    X    |          | dyn      |         |    X     |    |    |
---      9 | dyn      |    X    |    X     | dyn      |         |    X     |  X |    |
---     10 | static   |         |          | dyn      |         |    X     |  X |    |
---     11 | dyn      |         |          | dyn      |    X    |          |    |  X |
---     12 | dyn      |         |    X     | dyn      |    X    |          |    |    |
---     13 | dyn      |    X    |          | dyn      |    X    |          |    |  X |
---     14 | dyn      |    X    |    X     | dyn      |    X    |          |    |    |
---     15 | static   |         |          | dyn      |    X    |          |    |    |
---     16 | dyn      |         |          | dyn      |    X    |     X    |    |  X |
---     17 | dyn      |         |    X     | dyn      |    X    |     X    |    |    |
---     18 | dyn      |    X    |          | dyn      |    X    |     X    |    |  X |
---     19 | dyn      |    X    |    X     | dyn      |    X    |     X    |    |    |
---     20 | static   |         |          | dyn      |    X    |     X    |    |    |
---     21 | dyn      |         |          | static   |         |          |    |  X |
---     22 | dyn      |         |    X     | static   |         |          |    |    |
---     23 | dyn      |    X    |          | static   |         |          |    |  X |
---     24 | dyn      |    X    |    X     | static   |         |          |    |    |
+-- case # | lhs type | lhs pre | lhs post | rhs type | rhs pre | rhs post -> fr | gr |
+-- ------------------------------------------------------------------------>----------
+--      1 | dyn      |         |          | dyn      |         |          ->    |    |
+--      2 | dyn      |         |    X     | dyn      |         |          ->  X |    |
+--      3 | dyn      |    X    |          | dyn      |         |          ->    |    |
+--      4 | dyn      |    X    |    X     | dyn      |         |          ->  X |    |
+--      5 | static   |         |          | dyn      |         |          ->  X |    |
+--      6 | dyn      |         |          | dyn      |         |    X     ->    |    |
+--      7 | dyn      |         |    X     | dyn      |         |    X     ->  X |    |
+--      8 | dyn      |    X    |          | dyn      |         |    X     ->    |    |
+--      9 | dyn      |    X    |    X     | dyn      |         |    X     ->  X |    |
+--     10 | static   |         |          | dyn      |         |    X     ->  X |    |
+--     11 | dyn      |         |          | dyn      |    X    |          ->    |  X |
+--     12 | dyn      |         |    X     | dyn      |    X    |          ->    |    |
+--     13 | dyn      |    X    |          | dyn      |    X    |          ->    |  X |
+--     14 | dyn      |    X    |    X     | dyn      |    X    |          ->    |    |
+--     15 | static   |         |          | dyn      |    X    |          ->    |    |
+--     16 | dyn      |         |          | dyn      |    X    |     X    ->    |  X |
+--     17 | dyn      |         |    X     | dyn      |    X    |     X    ->    |    |
+--     18 | dyn      |    X    |          | dyn      |    X    |     X    ->    |  X |
+--     19 | dyn      |    X    |    X     | dyn      |    X    |     X    ->    |    |
+--     20 | static   |         |          | dyn      |    X    |     X    ->    |    |
+--     21 | dyn      |         |          | static   |         |          ->    |  X |
+--     22 | dyn      |         |    X     | static   |         |          ->    |    |
+--     23 | dyn      |    X    |          | static   |         |          ->    |  X |
+--     24 | dyn      |    X    |    X     | static   |         |          ->    |    |
+--     25 | static   |         |          | static   |         |          ->    |    |
 --
+--( the static >>= static case is defined in Bind.Marshal.Action.Monad.Static
 -- 
 -- XXX: I think only a few Bind instances are actually required. My attempts to simplify have, thus
 -- far, failed. The problem I keep running into is a failure to match against the most specific

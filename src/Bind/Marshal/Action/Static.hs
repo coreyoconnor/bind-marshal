@@ -24,16 +24,27 @@ import GHC.Ptr
 
 import System.IO
 
+-- | a function that accesses a memory region containing the provided address
+--
+-- There is no need to provide the values for the memory region start or end. The types of actions
+-- that build these equations assures the action does not access outside of the region.
+--
+-- XXX: This can be lifted from the IO monad. Hide the use of IO beneath a pure state monad. Hide
+-- the IO usage much like bytestring does. However that is nice for users but adds complexity to my
+-- thinking on the internals. So I won't hide the IO for now. :-)
 type StaticIter r = Addr# -> IO r
 
--- | A buffer static memory action. When executed:
+-- | A buffer static memory action. An function that provides a StaticIter given a normal path
+-- function and failure path function.
 newtype StaticMemAction buffer_iter_tag size a = StaticMemAction
     { static_eval :: forall c
         .  ( a      -> StaticIter c ) -- normal path
         -> ( String -> IO c )         -- failure path
-        -> StaticIter c               -- cont
+        -> StaticIter c               -- continuation
     }
 
+-- | Simple helper that evaluates a StaticMemAction. Provides return for the final normal path
+-- function and IO.fail as the failure path function.
 {-# INLINE io_eval_static #-}
 io_eval_static :: StaticMemAction tag size a -> Iter -> IO ( a, Iter )
 io_eval_static (StaticMemAction ma) (Ptr !p) 
@@ -64,6 +75,12 @@ instance Functor ( StaticMemAction buffer_iter_tag size ) where
  -  => expression a_0 >>= fa_1, in the type environment at that point has the type forall a. a
  -}
 
+-- | A form of replicateM whose type contains the number of replications. 
+--
+-- This implies that this equation cannot replicate the action a variable number of times. That's
+-- what the normal replicateM is for.
+--
+-- XXX: Unimplemented
 static_replicateM :: ( Pos n 
                      , size_2 ~ Add size_0 (Mul n size_1)
                      , Bind (StaticMemAction tag size_0)
