@@ -97,7 +97,7 @@ instance BufferDelegate LazyBSDes where
             in returnM $! bd { bs = bs' } :: IO LazyBSDes
 
 {-# NOINLINE decode #-}
-decode :: forall a . SealedDynamicDesAction LazyBSDes a 
+decode :: forall a . SealedDesAction LazyBSDes a 
            -> L.ByteString 
            -> (a, L.ByteString)
 decode des_action b = unsafePerformIO ( do
@@ -105,7 +105,7 @@ decode des_action b = unsafePerformIO ( do
     )
 
 {-# NOINLINE decode_ #-}
-decode_ :: forall a . SealedDynamicDesAction LazyBSDes a -> L.ByteString -> a
+decode_ :: forall a . SealedDesAction LazyBSDes a -> L.ByteString -> a
 decode_ des_action b = unsafePerformIO ( do
     ( a, _ ) <- with_bytestring_provider b (des_from_buffer_delegate des_action)
     returnM a :: IO a

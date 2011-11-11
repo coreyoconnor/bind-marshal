@@ -64,7 +64,7 @@ import System.IO
   #-}
 des_from_buffer_delegate_ :: forall out_type buffer_delegate .
                             ( BufferDelegate buffer_delegate
-                            ) => SealedDynamicDesAction buffer_delegate out_type
+                            ) => SealedDesAction buffer_delegate out_type
                               -> buffer_delegate
                               -> IO out_type
 des_from_buffer_delegate_ (SealedSealedAction a) buffer_delegate = 
@@ -81,7 +81,7 @@ des_from_buffer_delegate_ (SealedSealedAction a) buffer_delegate =
   #-}
 des_from_buffer_delegate :: forall out_type buffer_delegate .
                             ( BufferDelegate buffer_delegate
-                            ) => SealedDynamicDesAction buffer_delegate out_type
+                            ) => SealedDesAction buffer_delegate out_type
                               -> buffer_delegate
                               -> IO (out_type, buffer_delegate)
 des_from_buffer_delegate (SealedSealedAction a) buffer_delegate = 

@@ -13,6 +13,6 @@ import Bind.Marshal.DesAction.Base
 -- | A dynamic deserialization action consumes bytes from a buffer delegate
 type DesAction a = forall bd . DynAction bd DesTag a 
 
-type SealedDynamicDesAction bd a = DynAction_ Sealed Sealed Sealed bd DesTag a
+type SealedDesAction bd a = DynAction_ Sealed Sealed Sealed bd DesTag a
 
 
