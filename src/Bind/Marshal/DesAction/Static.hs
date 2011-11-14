@@ -32,7 +32,7 @@ type StaticDesAction size a = StaticMemAction DesTag size a
 -- | 'des' is a deserialization action that has a static buffer requirement. However the resulting
 -- action monad of a 'des' can be dynamic or static.
 {-# INLINE des #-}
-des :: forall t sm_tail . 
+des :: forall t . 
         ( CanDeserialize t
         , Nat (BufferReq t)
         ) => StaticDesAction (BufferReq t) t
@@ -43,10 +43,15 @@ des = case toInt (undefined :: (BufferReq t)) of
                         eval_cont v (plusAddr# p type_size)
                     )
 
--- | To execute a deserialization action:
---  - determine the final data model of the deserialization action monad by fixing the initial data
---  model as DMNil.
---  - evaluate the action via CPS
+{-# INLINE drop #-}
+drop :: forall n . Nat n => StaticDesAction n ()
+drop = case toInt (undefined :: n ) of
+    I# drop_bytes -> StaticMemAction
+                     ( \ eval_cont _fail_cont !p -> eval_cont () 
+                                                              (plusAddr# p drop_bytes) 
+                     )
+
+-- | executes a deserialization action given a pre-allocated buffer of fixed sized.
 {-# INLINE apply_des_to_fixed_buffer #-}
 apply_des_to_fixed_buffer :: forall size out_type .
                               ( NFData out_type
@@ -67,6 +72,9 @@ apply_des_to_fixed_buffer (StaticMemAction ma) !buffer =
             False -> apply_des_to_fixed_buffer_unsafe (StaticMemAction ma) buffer
 
 {-# INLINE apply_des_to_fixed_buffer_unsafe #-}
+-- | executes a deserialization action given a pre-allocated buffer of fixed sized.
+--
+-- Assumes the provided buffer has enough bytes for the deserialization action.
 apply_des_to_fixed_buffer_unsafe :: forall size out_type 
                                     . StaticDesAction size out_type
                                     -> DesBuffer
