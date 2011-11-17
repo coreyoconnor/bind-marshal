@@ -2,7 +2,9 @@
 -- License     :  BSD-style (see the file LICENSE)
 
 {-# LANGUAGE MagicHash #-}
-module Bind.Marshal.DesAction.Static
+module Bind.Marshal.DesAction.Static ( module Bind.Marshal.DesAction.Static
+                                     , module Bind.Marshal.DesAction.Base
+                                     )
 where
 
 import Bind.Marshal.Prelude
@@ -16,12 +18,9 @@ import Bind.Marshal.DesAction.Base
 import Control.DeepSeq
 import Control.Exception ( evaluate )
 
-import Data.IORef
-
 import Data.Strict.Either
 import Data.Strict.Tuple
 
-import GHC.Err ( error )
 import GHC.Exts
 import GHC.Prim
 
@@ -29,8 +28,8 @@ import System.IO ( IO(..) )
 
 type StaticDesAction size a = StaticMemAction DesTag size a
 
--- | 'des' is a deserialization action that has a static buffer requirement. However the resulting
--- action monad of a 'des' can be dynamic or static.
+-- | des deserializes a value with type t from a buffer that has at least BufferReq t byte
+-- available.
 {-# INLINE des #-}
 des :: forall t . 
         ( CanDeserialize t
@@ -43,9 +42,9 @@ des = case toInt (undefined :: (BufferReq t)) of
                         eval_cont v (plusAddr# p type_size)
                     )
 
-{-# INLINE drop #-}
-drop :: forall n . Nat n => StaticDesAction n ()
-drop = case toInt (undefined :: n ) of
+{-# INLINE skip_bytes #-}
+skip_bytes :: forall n . Nat n => StaticDesAction n ()
+skip_bytes = case toInt (undefined :: n ) of
     I# drop_bytes -> StaticMemAction
                      ( \ eval_cont _fail_cont !p -> eval_cont () 
                                                               (plusAddr# p drop_bytes) 

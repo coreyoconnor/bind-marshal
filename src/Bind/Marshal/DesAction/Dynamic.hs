@@ -35,7 +35,6 @@ import Bind.Marshal.Action.Dynamic
 import Bind.Marshal.Action.Static
 import Bind.Marshal.Action.Monad
 import Bind.Marshal.DataModel
-import Bind.Marshal.DesAction.Base
 import Bind.Marshal.DesAction.Dynamic.Base
 import Bind.Marshal.DesAction.Static
 import Bind.Marshal.StdLib.Dynamic.FixedBuffer

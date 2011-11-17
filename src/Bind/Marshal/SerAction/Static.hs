@@ -2,7 +2,9 @@
 -- License     :  BSD-style (see the file LICENSE)
 
 {-# LANGUAGE MagicHash #-}
-module Bind.Marshal.SerAction.Static
+module Bind.Marshal.SerAction.Static ( module Bind.Marshal.SerAction.Static
+                                     , module Bind.Marshal.SerAction.Base
+                                     )
 where
 
 import Bind.Marshal.Prelude
@@ -26,6 +28,7 @@ import System.IO ( IO(..) )
 
 type StaticSerAction size a = StaticMemAction SerTag size a
 
+-- | ser serializes the value with type t to at most BufferReq t bytes.
 {-# INLINE ser #-}
 ser :: forall t .
        ( CanSerialize t
@@ -54,6 +57,7 @@ apply_ser_to_fixed_buffer :: forall size out_type .
 apply_ser_to_fixed_buffer (StaticMemAction ma) !buffer =
     case toInt (undefined :: size) of
         !required_size -> case required_size > (buffer_region_size buffer) of
+            -- XXX: Implement serializtion to temp buffer and check for overflow before failing
             True -> fail $! "serialization requires " 
                             ++ show required_size 
                             ++ " bytes but buffer has only "

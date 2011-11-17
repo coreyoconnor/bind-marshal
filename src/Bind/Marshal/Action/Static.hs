@@ -91,3 +91,8 @@ static_replicateM :: ( Pos n
                        -> StaticMemAction tag size_2 [a]
 static_replicateM _count f = undefined
 
+{-
+infixr 1 <|>
+
+(<|>) :: 
+-}

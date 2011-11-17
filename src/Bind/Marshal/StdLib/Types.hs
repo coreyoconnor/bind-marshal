@@ -7,8 +7,6 @@ import Bind.Marshal.Prelude
 
 import Bind.Marshal.Action.Base
 
-import Data.Int
-
 type instance BufferReq Word8 = D1
 type instance BufferReq Word16 = D2
 type instance BufferReq Word32 = D4

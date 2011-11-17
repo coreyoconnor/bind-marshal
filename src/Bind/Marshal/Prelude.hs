@@ -40,7 +40,7 @@ import Data.Char
 import Data.Eq
 import Data.Functor
 import Data.List hiding ( product, sum )
-import Data.Int ( Int32(..) )
+import Data.Int 
 import Data.String
 import Data.Word
 
