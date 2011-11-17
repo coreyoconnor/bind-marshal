@@ -6,6 +6,7 @@ module Bind.Marshal.Prelude ( module Bind.Marshal.Prelude
                             , module Prelude
                             , module Bind.Marshal.Control.Monad.Parameterized
                             , module Data.Bool
+                            , module Data.Bits
                             , module Data.Char
                             , module Data.Eq
                             , module Data.Functor
@@ -35,6 +36,7 @@ import Prelude ( ($)
                , Ord(..)
                )
 
+import Data.Bits
 import Data.Bool
 import Data.Char
 import Data.Eq
