@@ -1,8 +1,8 @@
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PackageImports #-}
-{-# LANGUAGE NoRebindableSyntax #-}
 {-# LANGUAGE ImplicitPrelude #-}
 module ArbMarshal.GenCode
 where
@@ -26,7 +26,9 @@ full_static_module (StaticStructure props) name = (flip evalState) 0 $ execWrite
     tell $ show (StaticStructure props)
     tell "\n"
 
-bind_marshal_module_header name = tell $ "module TestCases." ++ name ++ " where\n\
+bind_marshal_module_header name = tell $ "\
+{-# LANGUAGE RebindableSyntax #-}\n\
+module TestCases." ++ name ++ " where\n\
 import Bind.Marshal.Prelude\n\
 import Bind.Marshal.Action.Base\n\
 import Bind.Marshal.Action.Monad.Static\n\
