@@ -21,12 +21,22 @@ instance ( m ~ D0
     {-# INLINE returnM #-}
     returnM !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
 
--- This duplicates the returnM for a static mem action due to some silliness in the GHC 6.12
+-- | This duplicates the returnM for a static mem action due to some silliness in the GHC 6.12
 -- inliner. Without the duplication the inliner fails to, well, inline and the optimization of using
 -- CPS form in returnM is lost.
+--
+-- XXX: I think adding a Bind S Identity S instance would enable the user to just use the standard "return".
 {-# INLINE static_return #-}
 static_return :: a -> StaticMemAction tag D0 a
 static_return !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
+
+-- | Like return but it pads the buffer req by a given amount
+--
+-- This is safe for use in both deserialization and serialization actions.
+-- This does not change the position for the next serialization or deserialization. This only
+-- increases the type level buffer requirement.
+return_padded :: Nat n => n -> a -> StaticMemAction tag n a
+return_padded _ !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
 
 -- | possibly-failing pattern matches require a Fail instance.
 instance Fail ( StaticMemAction tag

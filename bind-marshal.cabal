@@ -101,7 +101,6 @@ Library
                         ForeignFunctionInterface
                         ScopedTypeVariables
                         NoImplicitPrelude
-                        RebindableSyntax
                         NamedFieldPuns
                         UndecidableInstances
                         TypeSynonymInstances

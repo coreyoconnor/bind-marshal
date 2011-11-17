@@ -1,3 +1,4 @@
+{-# LANGUAGE RebindableSyntax #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
@@ -50,4 +51,8 @@ des_word32_be = do
             out_1 -> case (toEnum $! fromEnum v_2) `shiftL` 8 of
                 out_2 -> case toEnum $! fromEnum v_3 of
                     out_3 -> static_return $! out_0 .|. out_1 .|. out_2 .|. out_3
+
+{-# INLINE des_byte #-}
+des_byte :: StaticDesAction D1 Word8
+des_byte = des
 

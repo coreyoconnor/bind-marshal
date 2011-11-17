@@ -14,7 +14,7 @@ import Data.TypeLevel.Bool
 
 -- Type level naturals based on Peano numbers
 import Data.TypeLevel.Num.Aliases
-import Data.TypeLevel.Num.Ops ( Add(..), Mul(..) )
+import Data.TypeLevel.Num.Ops ( Pred(..), Succ(..), Add(..), Mul(..) )
 import Data.TypeLevel.Num.Reps
 import Data.TypeLevel.Num.Sets
 

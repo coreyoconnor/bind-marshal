@@ -1,3 +1,4 @@
+{-# LANGUAGE RebindableSyntax #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
@@ -43,6 +44,7 @@ des = case toInt (undefined :: (BufferReq t)) of
                     )
 
 {-# INLINE skip_bytes #-}
+-- | Skips n bytes, where n is a type level number, of the input buffer.
 skip_bytes :: forall n . Nat n => StaticDesAction n ()
 skip_bytes = case toInt (undefined :: n ) of
     I# drop_bytes -> StaticMemAction

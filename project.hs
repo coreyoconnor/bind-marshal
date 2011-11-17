@@ -26,7 +26,6 @@ main = project $ do
     ghc_option "-XCPP"
     ghc_option "-XForeignFunctionInterface"
     ghc_option "-XScopedTypeVariables"
-    ghc_option "-XRebindableSyntax"
     ghc_option "-XNoImplicitPrelude"
     ghc_option "-XNamedFieldPuns"
     ghc_option "-XUndecidableInstances"

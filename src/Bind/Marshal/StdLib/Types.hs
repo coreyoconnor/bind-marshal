@@ -10,8 +10,10 @@ import Bind.Marshal.Action.Base
 type instance BufferReq Word8 = D1
 type instance BufferReq Word16 = D2
 type instance BufferReq Word32 = D4
+type instance BufferReq Word64 = D8
 
 type instance BufferReq Int8 = D1
 type instance BufferReq Int16 = D2
 type instance BufferReq Int32 = D4
+type instance BufferReq Int64 = D8
 
