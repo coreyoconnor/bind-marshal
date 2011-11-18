@@ -1,3 +1,4 @@
+{-# LANGUAGE FunctionalDependencies #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
@@ -14,7 +15,13 @@ import Data.TypeLevel.Bool
 
 -- Type level naturals based on Peano numbers
 import Data.TypeLevel.Num.Aliases
-import Data.TypeLevel.Num.Ops ( Pred(..), Succ(..), Add(..), Mul(..) )
+import Data.TypeLevel.Num.Ops ( Pred(..)
+                              , Succ(..)
+                              , Add(..)
+                              , Sub(..)
+                              , Mul(..) 
+                              , Div(..)
+                              )
 import Data.TypeLevel.Num.Reps
 import Data.TypeLevel.Num.Sets
 
@@ -43,4 +50,12 @@ class ReifiesTo t r where
 -- Add the identity function to ReifiesTo
 instance ReifiesTo t t where
     reify v = v
+
+class IsBool b
+instance IsBool True
+instance IsBool False
+
+class IsBool b => TypeEq x y b | x y -> b
+instance TypeEq x x True
+instance ( IsBool b, False ~ b ) => TypeEq x y b
 

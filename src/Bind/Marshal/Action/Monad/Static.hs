@@ -1,6 +1,7 @@
+{-# LANGUAGE OverlappingInstances #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
-
+{-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE CPP #-}
 module Bind.Marshal.Action.Monad.Static where
 
@@ -9,6 +10,8 @@ import Bind.Marshal.Prelude
 import Bind.Marshal.Action.Base
 import Bind.Marshal.Action.Static
 import Bind.Marshal.DataModel
+
+import Data.Traversable
 
 import GHC.Exts ( inline )
 
@@ -71,3 +74,118 @@ instance ( size_2 ~ Add size_0 size_1
                                                         fail_cont
                           )
 
+-- | A form of replicateM whose type contains the number of replications. 
+--
+-- This implies that this equation cannot replicate the action a variable number of times. That's
+-- what the normal replicateM is for.
+--
+-- XXX: Unimplemented
+{-
+static_replicateM :: ( Pos n 
+                     , size_2 ~ Add size_0 (Mul n size_1)
+                     , Bind (StaticMemAction tag size_0)
+                            (StaticMemAction tag size_1)
+                            (StaticMemAction tag size_2)
+                     ) => n 
+                       -> StaticMemAction tag size_1  a
+                       -> StaticMemAction tag size_2 [a]
+-}
+static_replicateM ( _ :: count ) f = case toInt ( undefined :: count ) of
+    n -> bounded_replicateM ( undefined :: count ) n f
+
+-- | Like replicateM but the count is no more than n times where n is a type variable.
+--
+--
+bounded_replicateM _ count f = undefined
+
+-- | variant of static_replicateM that ignores the result of the action.
+static_replicateM_ ( _ :: count ) f = case toInt ( undefined :: count ) of
+    n -> bounded_replicateM_ ( undefined :: count ) n f
+
+-- | variant of bounded_replicateM that ignores the result of the action.
+bounded_replicateM_ _ count f = undefined
+
+-- | Accumulates using the provided static action accumulation function.
+--
+-- XXX: Not the prettiest of implementations...
+{-# INLINE[1] bounded_accum #-}
+bounded_accum :: forall tag a max_count f_size total_size .
+                 ( Nat max_count
+                 , total_size ~ Mul max_count f_size
+                 ) => max_count
+                   -> Int
+                   -> ( a -> StaticMemAction tag f_size a )
+                   -> a
+                   -> StaticMemAction tag total_size a
+bounded_accum _ !count !f !a = case toInt ( undefined :: max_count ) of
+    !max_count 
+        | max_count < count -> fail $ "bounded_accum: requested count "
+                                    ++ "(" ++ show count ++ ") "
+                                    ++ "exceeds max_count "
+                                    ++ "(" ++ show max_count ++ ")"
+        | otherwise         -> StaticMemAction ( \ on_done on_fail -> 
+            -- duplicate the f action n times 
+            let loop !0 !a_final = on_done a_final
+                loop !n !a'      = case f a' of
+                        StaticMemAction f_action -> f_action (loop $! n - 1)
+                                                             on_fail
+            in loop count a
+        )
+    
+
+#if 0
+class BoundedAccum max_count f_size  where
+    bounded_accum :: forall tag a . max_count
+                                  -> Int 
+                                  -> ( a -> StaticMemAction tag f_size a ) 
+                                  -> a 
+                                  -> StaticMemAction tag (Mul max_count f_size) a
+
+instance BoundedAccum_ D0 D0 (Mul max_count f_size ) max_count f_size => BoundedAccum max_count f_size where
+    bounded_accum _ = bounded_accum_ ( undefined :: D0 )
+                                     ( undefined :: D0 )
+                                     ( undefined :: Mul max_count f_size )
+                                     ( undefined :: max_count )
+
+class BoundedAccum_ size count max_size max_count f_size where
+    bounded_accum_ :: forall tag a . size
+                                   -> count
+                                   -> max_size
+                                   -> max_count
+                                   -> Int
+                                   -> ( a -> StaticMemAction tag f_size a )
+                                   -> a
+                                   -> StaticMemAction tag (Sub max_size size) a
+
+{-
+instance ( D0 ~ Sub max_size max_size ) => BoundedAccum_ max_size max_count max_size max_count f_size where
+    bounded_accum_ _ _ _ _ _ _ a = return_padded ( undefined :: D0 ) a
+-}
+
+instance ( Nat ( Sub max_size size )
+         , Add f_size (Sub max_size (Add size f_size)) ~ Sub max_size size
+         ) => BoundedAccum_ size count max_size max_count f_size where
+    bounded_accum_ _size _count _max_size _max_count 0 _f a 
+        = return_padded ( undefined :: Sub max_size size ) a
+    bounded_accum_ _size _count _max_size _max_count n f a
+        = f a >>= bounded_accum_ ( undefined :: Add size f_size )
+                                 ( undefined :: Succ count )
+                                 ( undefined :: max_size )
+                                 ( undefined :: max_count )
+                                 ( n - 1 )
+                                 f
+
+
+#endif
+{-
+    bounded_accum_ _ _ 0 _f a 
+        = return_padded ( undefined :: remaining_size ) a
+    bounded_accum_ _remaining_size _count n f a 
+        = case toInt ( undefined :: count ) of
+            0 -> return_padded ( undefined :: remaining_size ) a
+            n -> -}
+{-
+infixr 1 <|>
+
+(<|>) :: 
+-}
