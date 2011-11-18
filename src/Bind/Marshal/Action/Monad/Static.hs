@@ -133,57 +133,6 @@ bounded_accum _ !count !f !a = case toInt ( undefined :: max_count ) of
         )
     
 
-#if 0
-class BoundedAccum max_count f_size  where
-    bounded_accum :: forall tag a . max_count
-                                  -> Int 
-                                  -> ( a -> StaticMemAction tag f_size a ) 
-                                  -> a 
-                                  -> StaticMemAction tag (Mul max_count f_size) a
-
-instance BoundedAccum_ D0 D0 (Mul max_count f_size ) max_count f_size => BoundedAccum max_count f_size where
-    bounded_accum _ = bounded_accum_ ( undefined :: D0 )
-                                     ( undefined :: D0 )
-                                     ( undefined :: Mul max_count f_size )
-                                     ( undefined :: max_count )
-
-class BoundedAccum_ size count max_size max_count f_size where
-    bounded_accum_ :: forall tag a . size
-                                   -> count
-                                   -> max_size
-                                   -> max_count
-                                   -> Int
-                                   -> ( a -> StaticMemAction tag f_size a )
-                                   -> a
-                                   -> StaticMemAction tag (Sub max_size size) a
-
-{-
-instance ( D0 ~ Sub max_size max_size ) => BoundedAccum_ max_size max_count max_size max_count f_size where
-    bounded_accum_ _ _ _ _ _ _ a = return_padded ( undefined :: D0 ) a
--}
-
-instance ( Nat ( Sub max_size size )
-         , Add f_size (Sub max_size (Add size f_size)) ~ Sub max_size size
-         ) => BoundedAccum_ size count max_size max_count f_size where
-    bounded_accum_ _size _count _max_size _max_count 0 _f a 
-        = return_padded ( undefined :: Sub max_size size ) a
-    bounded_accum_ _size _count _max_size _max_count n f a
-        = f a >>= bounded_accum_ ( undefined :: Add size f_size )
-                                 ( undefined :: Succ count )
-                                 ( undefined :: max_size )
-                                 ( undefined :: max_count )
-                                 ( n - 1 )
-                                 f
-
-
-#endif
-{-
-    bounded_accum_ _ _ 0 _f a 
-        = return_padded ( undefined :: remaining_size ) a
-    bounded_accum_ _remaining_size _count n f a 
-        = case toInt ( undefined :: count ) of
-            0 -> return_padded ( undefined :: remaining_size ) a
-            n -> -}
 {-
 infixr 1 <|>
 
