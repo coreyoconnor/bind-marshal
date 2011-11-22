@@ -108,7 +108,8 @@ bounded_replicateM_ _ count f = undefined
 -- | Accumulates using the provided static action accumulation function.
 --
 -- XXX: Not the prettiest of implementations...
-{-# INLINE[1] bounded_accum #-}
+-- XXX: Possible to provide loop unrolling through RULES? Possibly need *a lot*.
+{-# INLINE bounded_accum #-}
 bounded_accum :: forall tag a max_count f_size total_size .
                  ( Nat max_count
                  , total_size ~ Mul max_count f_size
@@ -133,7 +134,7 @@ bounded_accum _ !count !f !a = case toInt ( undefined :: max_count ) of
         )
     
 -- XXX: rewrite point free
-{-# INLINE [1] bounded_accum_ #-}
+{-# INLINE bounded_accum_ #-}
 bounded_accum_ :: forall tag max_count f_size total_size a .
                   ( Nat max_count
                   , total_size ~ Mul max_count f_size 
