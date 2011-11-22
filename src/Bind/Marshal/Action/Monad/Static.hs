@@ -132,6 +132,20 @@ bounded_accum _ !count !f !a = case toInt ( undefined :: max_count ) of
             in loop count a
         )
     
+-- XXX: rewrite point free
+{-# INLINE [1] bounded_accum_ #-}
+bounded_accum_ :: forall tag max_count f_size total_size a .
+                  ( Nat max_count
+                  , total_size ~ Mul max_count f_size 
+                  , total_size ~ Add total_size D0
+                  ) => max_count
+                    -> Int
+                    -> ( a -> StaticMemAction tag f_size a )
+                    -> a 
+                    -> StaticMemAction tag total_size ()
+bounded_accum_ _ !count !f !a = do
+    _ <- bounded_accum ( undefined :: max_count ) count f a
+    static_return ()
 
 {-
 infixr 1 <|>
