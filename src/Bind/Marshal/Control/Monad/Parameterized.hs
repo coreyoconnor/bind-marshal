@@ -29,8 +29,8 @@
 --  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 --  POSSIBILITY OF SUCH DAMAGE.
 -- 
--- monad-param Maintainer  :  Edward Kmett <ekmett@gmail.com>
--- Bind.Marshal Maintainer  :  Corey O'Connor <coreyoconnor@gmail.com>
+-- original monad-param Maintainer  :  Edward Kmett <ekmett@gmail.com>
+-- Bind.Marshal version's Maintainer  :  Corey O'Connor <coreyoconnor@gmail.com>
 -- Stability   :  experimental
 -- Portability :  non-portable (requires the kitchen sink)
 --
@@ -46,6 +46,9 @@
 -- because it is so awkward to import them all otherwise due to the fact that most of them re-export
 -- the 'Control.Monad.Monad' syntax.  Does not export "Control.Monad.ST" or "Control.Monad.Writer"
 -- since it is unclear if you want strict or lazy versions in scope
+--
+-- XXX: Partition out hte core from the adapters. Preferably put the adapters in separate libraries
+-- based on their dependencies.
 ----------------------------------------------------------------------------
 
 module Bind.Marshal.Control.Monad.Parameterized (
