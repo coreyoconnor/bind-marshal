@@ -30,14 +30,10 @@ import Foreign.Ptr
 
 import System.IO
 
-t_static = do
-    () <- des
-    static_return ()
-
 t_0 i = do 
     replicateM i $ dyn_action $ do
         x :: Word32 <- des
-        static_return x
+        return x
 
 main = run_test $ do
     verify1 "t_1" $ liftIOResult $ do

@@ -1,12 +1,12 @@
-{-# LANGUAGE RebindableSyntax #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
 {-# OPTIONS_GHC -fglasgow-exts #-}
+{-# LANGUAGE RebindableSyntax #-}
 {-# LANGUAGE OverlappingInstances #-}
 {-# LANGUAGE IncoherentInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-import Bind.Marshal.Prelude
+import Bind.Marshal.Prelude hiding ( Succ(..) )
 import Bind.Marshal.Verify
 
 import Data.Monoid

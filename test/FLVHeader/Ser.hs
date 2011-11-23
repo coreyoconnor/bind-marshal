@@ -26,5 +26,5 @@ ser_flv_header h = do
         ( False, True ) -> ser ( 4 :: Word8 )
         ( True, True ) -> ser ( 5 :: Word8 )
     ser $ header_size h
-    static_return ()
+    return ()
 

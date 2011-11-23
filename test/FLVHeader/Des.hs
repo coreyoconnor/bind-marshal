@@ -56,5 +56,5 @@ des_flv_header = do
                                         4 -> ( False, True )
                                         5 -> ( True, True )
 #endif
-    static_return $! FLVHeader version has_audio has_video header_size
+    return $! FLVHeader version has_audio has_video header_size
 

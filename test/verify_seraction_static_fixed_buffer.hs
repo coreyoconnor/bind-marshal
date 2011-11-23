@@ -32,21 +32,18 @@ import Foreign.Storable
 
 import System.IO
 
-t_0 = do 
-    static_return ()
-
 t_1 = do 
     ser (0 :: Int32)
-    static_return ()
+    return ()
 
 t_2 (y :: Int32) = do 
     ser y
-    static_return ()
+    return ()
 
 t_3 (x :: Int32) (y :: Int32) = do 
     ser x
     ser y
-    static_return ()
+    return ()
 
 t_4 = do
     ser (0 :: Int32)
@@ -56,7 +53,7 @@ t_4 = do
     ser (4 :: Int32)
     ser (5 :: Word32)
     ser (6 :: Word32)
-    static_return ()
+    return ()
 
 main = run_test $ do
     storable_buffer <- liftIO $ mallocBytes 2048 :: Test ( Ptr Word8 )

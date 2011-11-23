@@ -1,4 +1,3 @@
-{-# LANGUAGE RebindableSyntax #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
@@ -6,15 +5,12 @@
 {-# LANGUAGE OverlappingInstances #-}
 {-# LANGUAGE IncoherentInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-import Bind.Marshal.Prelude
-import Bind.Marshal.Verify
-
-import Prelude ( error )
+import Prelude 
 
 import Verify
 
 main = run_test $ do
-    returnM () :: Test ()
+    return () :: Test ()
 
 -- we have a few non-parameterize functor types
 data Foo a

@@ -37,7 +37,7 @@ des_word16_be = do
     v_low :: Word8 <- des
     case (toEnum $! fromEnum v_high) `shiftL` 8 of
         v_out_high -> case toEnum $! fromEnum v_low of
-            v_out_low -> static_return (v_out_high .|. v_out_low)
+            v_out_low -> return (v_out_high .|. v_out_low)
 
 {-# INLINE des_word32_be #-}
 des_word32_be :: StaticDesAction D4 Word32
@@ -50,7 +50,7 @@ des_word32_be = do
         out_0 -> case (toEnum $! fromEnum v_1) `shiftL` 16 of
             out_1 -> case (toEnum $! fromEnum v_2) `shiftL` 8 of
                 out_2 -> case toEnum $! fromEnum v_3 of
-                    out_3 -> static_return $! out_0 .|. out_1 .|. out_2 .|. out_3
+                    out_3 -> return $! out_0 .|. out_1 .|. out_2 .|. out_3
 
 {-# INLINE des_byte #-}
 des_byte :: StaticDesAction D1 Word8

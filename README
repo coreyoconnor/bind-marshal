@@ -19,20 +19,14 @@ foo :: StaticSerAction D8 () -- D8 is the type level representation of 8
 foo = do
     ser (256 :: Word32) -- ser for serialize
     ser (13 :: Word32)
-    static_return ()
+    return ()
 
 A more complex example would be:
 bar :: StaticSerAction D16 ()
 bar = do
     _ <- foo
     _ <- foo
-    static_return ()
-
-A note on syntax: The "static_return" is equivalent to "return" except it plays nicely with the
-mechanism that infers the buffer requirements. Actually, due to the use of parameterized monads
-"return" cannot be used. Instead "returnM" must be used which properly interacts with the
-parameterized monad machinery. So a more accurate statement would be that "static_return" is
-equivalent to "returnM".
+    return ()
 
 Static actions are useful for basic structures. However, most structures contain components whose
 marshalled size are dynamic; Not known at compile time. 
@@ -47,7 +41,7 @@ pew i = do
     replicateM i $ dyn_action $ do      
         x :: Word32 <- des              
         y :: Word32 <- des              
-        static_return ()
+        return ()
 
 Is evaluated (more or less) like so:
     0. For i times
@@ -57,6 +51,7 @@ Is evaluated (more or less) like so:
 
 
 Currently a "dyn_action" is required to "lift" a static action into a dynamic action monad. This
-should be automatic, but I have thus failed to get automatic lifting to work as a user expects. In
-the currently implementation: If the dyn_action is ommited the equation will fail to type check. 
+should be automatic, but I have thus failed to get automatic lifting to work as a user expects. So
+the user has to manually insert dyn_action when needed. However, if the dyn_action is ommited the
+equation will fail to type check. 
 

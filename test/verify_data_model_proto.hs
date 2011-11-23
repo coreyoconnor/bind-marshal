@@ -17,7 +17,8 @@ data DMNil
 data BSUnit rep
 
 -- | A tag that indicates the child action is statically replicated
-data Pos n => SReplicate n action
+data SReplicate n action where
+    SReplicate :: forall n action . Pos n => SReplicate n action
 
 -- | A static sequence of buffer static actions.
 data family BSSeq action bs_seq

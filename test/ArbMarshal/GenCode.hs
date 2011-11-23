@@ -16,12 +16,12 @@ full_static_module (StaticStructure props) name = (flip evalState) 0 $ execWrite
     bind_marshal_module_header name
     tell $ "des_static_structure = do \n"
     mapM_ (\p -> tell "    " >> des_prop p >> tell "\n") props
-    tell "    static_return "
+    tell "    return "
     output_return_map props
     tell $ "ser_static_structure vs = do \n"
     output_variables_map props
     output_prop_ser props
-    tell "    static_return ()\n\n"
+    tell "    return ()\n\n"
     tell $ "static_structure = "
     tell $ show (StaticStructure props)
     tell "\n"

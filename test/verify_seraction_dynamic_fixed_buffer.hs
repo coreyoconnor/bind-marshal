@@ -23,7 +23,7 @@ import System.IO
 
 static_ser = do 
     ser (0 :: Int32)
-    static_return ()
+    return ()
 
 main = run_test $ do
     storable_buffer <- liftIO $ mallocBytes (4 * 1024) :: Test ( Ptr Word8 )

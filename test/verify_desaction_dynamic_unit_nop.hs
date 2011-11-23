@@ -26,58 +26,45 @@ import Foreign.Ptr
 
 import System.IO
 
-t_static = do
-    () <- des
-    static_return ()
-
 t_0 i = do 
     replicateM i $ dyn_action $ do
         () <- des
-        static_return ()
+        return ()
+    return ()
 
 t_1 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         () <- des
-        static_return ()
-    static_return ()
+        return ()
 
 t_2 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         () <- des
         () <- des
-        static_return ()
-    static_return ()
+        return ()
 
 t_3 = do
     () <- des
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         () <- des
-        static_return ()
-    static_return ()
+        return ()
 
 t_4 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         () <- des
-        static_return ()
+        return ()
     () <- des
-    static_return ()
+    return ()
 
 t_5 = do
     dyn_action $ do
         () <- des
-        static_return ()
+        return ()
     () <- des
-    static_return ()
+    return ()
 
 main = run_test $ do
     buffer_0 <- liftIO $ mallocBytes (4 * 1024 * 1024) :: Test ( Ptr Word8 )
-
-    -- the first two tests assure the parameterized monad Bind typeing is correct.
-    verify1 "t_static can deserialize from a memory block of 0 bytes" $ marshalled_byte_count t_static == 0
-    verify1 "Deserializes t_static" $ liftIOResult $ do
-        let des_buf = BufferRegion buffer_0 0
-        ((), b_end') <- apply_des_to_fixed_buffer t_static des_buf
-        returnM succeeded :: IO PropertyResult
 
     -- Now try some dynamic deserializations
     log_out "validated there are 5 bufferings of size 0" :: Test ()

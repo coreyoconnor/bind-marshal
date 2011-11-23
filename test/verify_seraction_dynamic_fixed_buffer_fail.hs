@@ -22,9 +22,6 @@ import Foreign.Storable
 import System.IO
 
 
-t_0 = do
-    static_return ()
-
 t_1 = do
     forM_ [1 :: Int32 .. 10] $ \i -> dyn_action $ do
         ser i
@@ -33,12 +30,6 @@ main = run_test $ do
     storable_ptr <- liftIO $ mallocBytes (4 * 1024) :: Test ( Ptr Word8 )
     ser_ptr <- liftIO $ mallocBytes (4 * 1024) :: Test ( Ptr Word8 )
     
-    verify1 "empty static" $ liftIOResult $ do
-        let ser_buffer = BufferRegion ser_ptr 0
-        ((), ser_buffer') <- apply_ser_to_fixed_buffer t_0 ser_buffer
-        returnM succeeded :: IO PropertyResult
-
-
     verify1 "0 sized region fails" $ liftIOResult $ do
         ser_handler <- fixed_buffer $ BufferRegion ser_ptr 0
         assert_throws "buffer underrun" $ ser_to_buffer_delegate t_1 ser_handler

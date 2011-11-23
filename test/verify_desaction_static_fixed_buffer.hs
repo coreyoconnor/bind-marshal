@@ -30,22 +30,19 @@ import Foreign.Storable
 
 import System.IO
 
-t_0 = do 
-    static_return ()
-
 t_1 = do 
     y :: Int32 <- des 
-    static_return y
+    return y
 
 t_2 = do
     x :: Int32 <- des
     y :: Int32 <- des
-    static_return ( x, y )
+    return ( x, y )
 
 t_3 = do
     x :: Int32 <- des
     y :: Int32 <- des
-    static_return ()
+    return ()
 
 -- The buffer size in this case is static even though there is a deserialized value dependency:
 -- Regardless of the value deserialized the buffer requirement is the same.
@@ -54,14 +51,14 @@ t_4 = do
     if b == 0 
         then do
             _ :: Int32 <- des
-            static_return ()
+            return ()
         else do
             _ :: Word8 <- des
             _ :: Word8 <- des
             _ :: Word8 <- des
             _ :: Word8 <- des
-            static_return ()
-    static_return ()
+            return ()
+    return ()
 
 #if !ONLY_SMALL_CASES
 t_6 = do
@@ -80,7 +77,7 @@ t_6 = do
     a12 :: Int32 <- des
     a13 :: Int32 <- des
     a14 :: Int32 <- des
-    static_return ( a0 
+    return ( a0 
             + a1
             + a2
             + a3
@@ -108,7 +105,7 @@ t_7 = do
     b7 <- t_6
     b8 <- t_6
     b9 <- t_6
-    static_return ( b0 
+    return ( b0 
             + b1 
             + b2 
             + b3
@@ -132,7 +129,7 @@ t_8 = do
     b7 <- t_7
     b8 <- t_7
     b9 <- t_7
-    static_return ( b0 
+    return ( b0 
             + b1 
             + b2 
             + b3

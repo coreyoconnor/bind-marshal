@@ -22,7 +22,7 @@ import System.IO
 
 des_word32_1k = static_replicateM (undefined :: D1000) $ do
     v :: Word32 <- des
-    static_return v
+    return v
 
 des_flv_header_1k = static_replicateM (undefined :: D1000) des_flv_header
 

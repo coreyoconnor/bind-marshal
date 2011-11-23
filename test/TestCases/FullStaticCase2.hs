@@ -18,66 +18,80 @@ import ArbMarshal.GenCode.Utils
 import Data.Word
 
 des_static_structure = do 
+    203 :: Word8 <- des
     v_0 :: Word8 <- des
-    v_1 :: Word8 <- des
-    51808 :: Word16 <- des_word16_be
-    v_2 :: Word8 <- des
-    v_3 :: Word8 <- des
-    584486432 :: Word32 <- des_word32_be
-    v_4 :: Word8 <- des
-    v_5 :: Word8 <- des
-    v_6 :: Word16 <- des_word16_be
+    v_1 :: Word32 <- des_word32_be
+    451217082 :: Word32 <- des_word32_be
+    222 :: Word8 <- des
+    v_2 :: Word32 <- des_word32_be
+    v_3 :: Word16 <- des_word16_be
+    v_4 :: Word32 <- des_word32_be
+    v_5 :: Word16 <- des_word16_be
+    v_6 :: Word32 <- des_word32_be
     v_7 :: Word16 <- des_word16_be
-    34546 :: Word16 <- des_word16_be
-    v_8 :: Word32 <- des_word32_be
-    157 :: Word8 <- des
-    923762175 :: Word32 <- des_word32_be
+    36025 :: Word16 <- des_word16_be
+    v_8 :: Word16 <- des_word16_be
     v_9 :: Word8 <- des
-    1725 :: Word16 <- des_word16_be
-    1327671739 :: Word32 <- des_word32_be
     v_10 :: Word8 <- des
-    v_11 :: Word32 <- des_word32_be
-    61918 :: Word16 <- des_word16_be
-    30617 :: Word16 <- des_word16_be
+    227 :: Word8 <- des
+    v_11 :: Word16 <- des_word16_be
     v_12 :: Word16 <- des_word16_be
-    v_13 :: Word8 <- des
-    845 :: Word16 <- des_word16_be
+    v_13 :: Word32 <- des_word32_be
+    47371 :: Word16 <- des_word16_be
     v_14 :: Word32 <- des_word32_be
-    35 :: Word8 <- des
-    182 :: Word8 <- des
+    1203508258 :: Word32 <- des_word32_be
+    1515784887 :: Word32 <- des_word32_be
+    7797 :: Word16 <- des_word16_be
+    38008 :: Word16 <- des_word16_be
+    246 :: Word8 <- des
     v_15 :: Word32 <- des_word32_be
-    static_return  [ Word8Value v_0 , Word8Value v_1 , Word8Value v_2 , Word8Value v_3 , Word8Value v_4 , Word8Value v_5 , Word16Value v_6 , Word16Value v_7 , Word32Value v_8 , Word8Value v_9 , Word8Value v_10 , Word32Value v_11 , Word16Value v_12 , Word8Value v_13 , Word32Value v_14 , Word32Value v_15 ]
+    9213 :: Word16 <- des_word16_be
+    v_16 :: Word16 <- des_word16_be
+    46464 :: Word16 <- des_word16_be
+    55850 :: Word16 <- des_word16_be
+    v_17 :: Word16 <- des_word16_be
+    4023663367 :: Word32 <- des_word32_be
+    126422238 :: Word32 <- des_word32_be
+    4093785628 :: Word32 <- des_word32_be
+    return  [ Word8Value v_0 , Word32Value v_1 , Word32Value v_2 , Word16Value v_3 , Word32Value v_4 , Word16Value v_5 , Word32Value v_6 , Word16Value v_7 , Word16Value v_8 , Word8Value v_9 , Word8Value v_10 , Word16Value v_11 , Word16Value v_12 , Word32Value v_13 , Word32Value v_14 , Word32Value v_15 , Word16Value v_16 , Word16Value v_17 ]
 
 ser_static_structure vs = do 
-    let [ Word8Value v_0 , Word8Value v_1 , Word8Value v_2 , Word8Value v_3 , Word8Value v_4 , Word8Value v_5 , Word16Value v_6 , Word16Value v_7 , Word32Value v_8 , Word8Value v_9 , Word8Value v_10 , Word32Value v_11 , Word16Value v_12 , Word8Value v_13 , Word32Value v_14 , Word32Value v_15 ] = vs 
+    let [ Word8Value v_0 , Word32Value v_1 , Word32Value v_2 , Word16Value v_3 , Word32Value v_4 , Word16Value v_5 , Word32Value v_6 , Word16Value v_7 , Word16Value v_8 , Word8Value v_9 , Word8Value v_10 , Word16Value v_11 , Word16Value v_12 , Word32Value v_13 , Word32Value v_14 , Word32Value v_15 , Word16Value v_16 , Word16Value v_17 ] = vs 
+    ser (203 :: Word8)
     ser v_0
-    ser v_1
-    ser_word16_be 51808
-    ser v_2
-    ser v_3
-    ser_word32_be 584486432
-    ser v_4
-    ser v_5
-    ser_word16_be v_6
+    ser_word32_be v_1
+    ser_word32_be 451217082
+    ser (222 :: Word8)
+    ser_word32_be v_2
+    ser_word16_be v_3
+    ser_word32_be v_4
+    ser_word16_be v_5
+    ser_word32_be v_6
     ser_word16_be v_7
-    ser_word16_be 34546
-    ser_word32_be v_8
-    ser (157 :: Word8)
-    ser_word32_be 923762175
+    ser_word16_be 36025
+    ser_word16_be v_8
     ser v_9
-    ser_word16_be 1725
-    ser_word32_be 1327671739
     ser v_10
-    ser_word32_be v_11
-    ser_word16_be 61918
-    ser_word16_be 30617
+    ser (227 :: Word8)
+    ser_word16_be v_11
     ser_word16_be v_12
-    ser v_13
-    ser_word16_be 845
+    ser_word32_be v_13
+    ser_word16_be 47371
     ser_word32_be v_14
-    ser (35 :: Word8)
-    ser (182 :: Word8)
+    ser_word32_be 1203508258
+    ser_word32_be 1515784887
+    ser_word16_be 7797
+    ser_word16_be 38008
+    ser (246 :: Word8)
     ser_word32_be v_15
-    static_return ()
+    ser_word16_be 9213
+    ser_word16_be v_16
+    ser_word16_be 46464
+    ser_word16_be 55850
+    ser_word16_be v_17
+    ser_word32_be 4023663367
+    ser_word32_be 126422238
+    ser_word32_be 4093785628
+    return ()
 
-static_structure = StaticStructure {properties = [Hole {byte_offset = 0, hole_type = Word8Hole},Hole {byte_offset = 1, hole_type = Word8Hole},Value (Word16Value 51808),Hole {byte_offset = 4, hole_type = Word8Hole},Hole {byte_offset = 5, hole_type = Word8Hole},Value (Word32Value 584486432),Hole {byte_offset = 10, hole_type = Word8Hole},Hole {byte_offset = 11, hole_type = Word8Hole},Hole {byte_offset = 12, hole_type = Word16Hole},Hole {byte_offset = 14, hole_type = Word16Hole},Value (Word16Value 34546),Hole {byte_offset = 18, hole_type = Word32Hole},Value (Word8Value 157),Value (Word32Value 923762175),Hole {byte_offset = 27, hole_type = Word8Hole},Value (Word16Value 1725),Value (Word32Value 1327671739),Hole {byte_offset = 34, hole_type = Word8Hole},Hole {byte_offset = 35, hole_type = Word32Hole},Value (Word16Value 61918),Value (Word16Value 30617),Hole {byte_offset = 43, hole_type = Word16Hole},Hole {byte_offset = 45, hole_type = Word8Hole},Value (Word16Value 845),Hole {byte_offset = 48, hole_type = Word32Hole},Value (Word8Value 35),Value (Word8Value 182),Hole {byte_offset = 54, hole_type = Word32Hole}]}
+static_structure = StaticStructure {properties = [Value (Word8Value 203),Hole {byte_offset = 1, hole_type = Word8Hole},Hole {byte_offset = 2, hole_type = Word32Hole},Value (Word32Value 451217082),Value (Word8Value 222),Hole {byte_offset = 11, hole_type = Word32Hole},Hole {byte_offset = 15, hole_type = Word16Hole},Hole {byte_offset = 17, hole_type = Word32Hole},Hole {byte_offset = 21, hole_type = Word16Hole},Hole {byte_offset = 23, hole_type = Word32Hole},Hole {byte_offset = 27, hole_type = Word16Hole},Value (Word16Value 36025),Hole {byte_offset = 31, hole_type = Word16Hole},Hole {byte_offset = 33, hole_type = Word8Hole},Hole {byte_offset = 34, hole_type = Word8Hole},Value (Word8Value 227),Hole {byte_offset = 36, hole_type = Word16Hole},Hole {byte_offset = 38, hole_type = Word16Hole},Hole {byte_offset = 40, hole_type = Word32Hole},Value (Word16Value 47371),Hole {byte_offset = 46, hole_type = Word32Hole},Value (Word32Value 1203508258),Value (Word32Value 1515784887),Value (Word16Value 7797),Value (Word16Value 38008),Value (Word8Value 246),Hole {byte_offset = 63, hole_type = Word32Hole},Value (Word16Value 9213),Hole {byte_offset = 69, hole_type = Word16Hole},Value (Word16Value 46464),Value (Word16Value 55850),Hole {byte_offset = 75, hole_type = Word16Hole},Value (Word32Value 4023663367),Value (Word32Value 126422238),Value (Word32Value 4093785628)]}

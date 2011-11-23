@@ -29,12 +29,12 @@ import System.IO
 
 t_static = do
     _ :: Word32 <- des
-    static_return ()
+    return ()
 
 t_0 i = do 
     replicateM i $ dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
+        return ()
 
 validate_t_0 :: BytePtr -> Test TestResult
 validate_t_0 buffer_0 = 
@@ -53,36 +53,36 @@ validate_t_0_inner buffer_0 i =  do
 t_1 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
-    static_return ()
+        return ()
+    return ()
 
 t_2 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         _ :: Word32 <- des
         _ :: Word32 <- des
-        static_return ()
-    static_return ()
+        return ()
+    return ()
 
 t_3 = do
     _ :: Word32 <- des
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
-    static_return ()
+        return ()
+    return ()
 
 t_4 = do
     forM_ [0..4] $ \(i :: Int) -> dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
+        return ()
     _ :: Word32 <- des
-    static_return ()
+    return ()
 
 t_5 = do
     dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
+        return ()
     _ :: Word32 <- des
-    static_return ()
+    return ()
 
 {-# NOINLINE replicate_print #-}
 replicate_print i = do

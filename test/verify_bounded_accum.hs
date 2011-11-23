@@ -21,7 +21,7 @@ import Foreign.Marshal.Alloc
 des_byte_w32_accum :: Word32 -> StaticDesAction D1 Word32
 des_byte_w32_accum a = do
     b <- des_byte
-    static_return $! (a `shiftL` 8) .|. fromIntegral b
+    return $! (a `shiftL` 8) .|. fromIntegral b
 
 {-# NOINLINE t_0 #-}
 t_0 :: StaticDesAction D4 Word32
@@ -37,7 +37,7 @@ main = run_test $ do
         unless ( w == maybe_w ) 
             $ fail $ "serialized " ++ show w ++ " deserialized " ++ show maybe_w
                 :: IO ()
-        returnM succeeded :: IO PropertyResult
+        return succeeded 
     liftIO $ free scratch_buffer :: Test ()
-    returnM () :: Test ()
+    return () 
 

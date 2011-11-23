@@ -64,6 +64,8 @@ instance Functor ( StaticMemAction buffer_iter_tag size ) where
  - I believe this would be possible with kind polymorphism.
  -
  - I am, of course, perhaps missing some other way to correctly represent the same concept. :-)
+ -
+ - XXX: GHC 7.4 should have kind polymorphism? 
  -}
 
 {- The middle parameter is left abstract in order for bind expressions to be correctly derivable.

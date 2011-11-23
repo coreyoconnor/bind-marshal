@@ -30,15 +30,11 @@ import Foreign.Ptr
 
 import System.IO
 
-t_static = do
-    () <- des
-    static_return ()
-
 t_0 i = do 
     rs <- replicateM i $ dyn_action $ do
         x :: Word32 <- des
-        static_return x
-    rs `deepseq` static_return ()
+        return x
+    rs `deepseq` return ()
 
 main = run_test $ do
     -- allocate enough space for the action, even though the buffer region specified will be

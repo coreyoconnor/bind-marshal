@@ -1,4 +1,3 @@
-{-# LANGUAGE RebindableSyntax #-}
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 
@@ -8,6 +7,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 import Prelude
+
+import Verify
 
 -- we have a few non-parameterize functor types
 data Foo a
@@ -64,3 +65,5 @@ t_0 = fix_dyn $! bind zab
 
 t_1 = fix_dyn $! bind non_zab
 
+main = run_test $ do
+    return ()

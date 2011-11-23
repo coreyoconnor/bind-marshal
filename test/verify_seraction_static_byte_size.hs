@@ -21,17 +21,16 @@ import FLVHeader.Data
 import FLVHeader.Ser
 #endif
 
-t_0 = do 
+t_0 = do
     ser ()
-    static_return ()
 
 t_1 = do 
     ser (0 :: Int32)
-    static_return ()
+    return ()
 
 t_2 (y :: Int32) = do 
     ser y
-    static_return ()
+    return ()
 
 t_3 = do
     ser (0 :: Int32)
@@ -41,7 +40,7 @@ t_3 = do
     ser (4 :: Int32)
     ser (5 :: Word32)
     ser (6 :: Word32)
-    static_return ()
+    return ()
 
 #if !ONLY_SMALL_CASES
 t_4 = do
@@ -60,7 +59,7 @@ t_4 = do
     ser (12 :: Word8)
     ser (13 :: Word8)
     ser (14 :: Word8)
-    static_return ()
+    return ()
 
 t_5 a b c d e f g h i j k l m n o = do
     ser (a :: Int32)
@@ -78,7 +77,7 @@ t_5 a b c d e f g h i j k l m n o = do
     ser (m :: Word8)
     ser (n :: Word8)
     ser (o :: Word8)
-    static_return ()
+    return ()
 #endif
 
 main = run_test $ do

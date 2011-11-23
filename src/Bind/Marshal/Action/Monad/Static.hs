@@ -17,21 +17,19 @@ import GHC.Exts ( inline )
 
 -- | The static memory action monad is constructed via the parameterized monad Return and Bind
 -- instances.
+--
+-- Typically you can just use 'return' like usual. There are cases where the compiler will not be
+-- able to pick a suitable default for the monad's type. 
+-- EG: "dyn_action ( return () >> return () )"
+-- In these cases return should be replaced by returnM with a type annotation fixing the monad type.
+-- EG: "dyn_action ( return () :: StaticDesAction D0 () )"
+--  
 instance ( m ~ D0
          )
          => Return (StaticMemAction tag m)
     where
     {-# INLINE returnM #-}
     returnM !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
-
--- | This duplicates the returnM for a static mem action due to some silliness in the GHC 6.12
--- inliner. Without the duplication the inliner fails to, well, inline and the optimization of using
--- CPS form in returnM is lost.
---
--- XXX: I think adding a Bind S Identity S instance would enable the user to just use the standard "return".
-{-# INLINE static_return #-}
-static_return :: a -> StaticMemAction tag D0 a
-static_return !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
 
 -- | Like return but it pads the buffer req by a given amount
 --
@@ -146,7 +144,7 @@ bounded_accum_ :: forall tag max_count f_size total_size a .
                     -> StaticMemAction tag total_size ()
 bounded_accum_ _ !count !f !a = do
     _ <- bounded_accum ( undefined :: max_count ) count f a
-    static_return ()
+    return ()
 
 {-
 infixr 1 <|>

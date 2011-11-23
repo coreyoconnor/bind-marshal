@@ -160,6 +160,10 @@ infixr 1  =<<
 return :: a -> Identity a
 return = Old.return
 
+{-# RULES
+    "return equiv" forall a . return a = Old.return a
+  #-}
+
 -- | Restrict the cases where we allow pattern matching to `fail`. You have to explicitly supply this for your `Monad`
 class Fail m where
 	fail :: String -> m a
@@ -173,6 +177,9 @@ class (Functor m, Functor m', Functor m'') => Bind m m' m'' | m m' -> m'' where
 instance Functor a => Bind Identity a a 	where m >>= f = f (runIdentity m)
 instance Functor a => Bind a Identity a 	where m >>= f = fmap (runIdentity . f) m
 instance Bind Identity Identity Identity 	where m >>= f = f (runIdentity m)
+
+instance Fail Identity where
+    fail msg = error msg
 
 (=<<) :: Bind m m' m'' => (a -> m' b) -> m a -> m'' b
 k =<< m = m >>= k

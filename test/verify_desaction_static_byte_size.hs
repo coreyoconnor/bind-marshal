@@ -21,23 +21,19 @@ import FLVHeader.Data
 import FLVHeader.Des
 #endif
 
-t_0 = do 
-    () <- des
-    static_return () 
-
 t_1 = do 
     y :: Int32 <- des 
-    static_return y
+    return y
 
 t_2 = do
     x :: Int32 <- des
     y :: Int32 <- des
-    static_return ( x, y )
+    return ( x, y )
 
 t_3 = do
     x :: Int32 <- des
     y :: Int32 <- des
-    static_return ()
+    return ()
 
 t_4 = do
     _ :: Int32 <- des
@@ -50,7 +46,7 @@ t_4 = do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    static_return ()
+    return ()
 
 t_5 = do
     _ :: Int32 <- des
@@ -65,7 +61,7 @@ t_5 = do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    static_return ()
+    return ()
 
 t_6 = do
     _ :: Int32 <- des
@@ -83,7 +79,7 @@ t_6 = do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    static_return ()
+    return ()
 
 #if !ONLY_SMALL_CASES
 t_7 = do
@@ -91,18 +87,17 @@ t_7 = do
     t_6
     t_6
     t_6
-    static_return ()
+    return ()
 
 t_8 = do
     t_7
     t_7
     t_7
     t_7
-    static_return ()
+    return ()
 #endif
 
 main = run_test $ do
-    verify1 "t_0 can deserialize from a memory block of 0 bytes" $ marshalled_byte_count t_0 == 0
     verify1 "t_1 can deserialize from a memory block of 4 bytes" $ marshalled_byte_count t_1 == 4
     verify1 "t_2 can deserialize from a memory block of 8 bytes" $ marshalled_byte_count t_2 == 8
     verify1 "t_6 can deserialize from a memory block of 60 bytes" $ marshalled_byte_count t_6 == 60

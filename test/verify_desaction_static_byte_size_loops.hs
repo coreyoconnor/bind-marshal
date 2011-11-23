@@ -29,21 +29,21 @@ repl_1k = static_replicateM (undefined :: D1000)
 
 t_0 = repl_1k $ do 
     () <- des
-    static_return () 
+    return () 
 
 t_1 = repl_1k $ do 
     y :: Int32 <- des 
-    static_return y
+    return y
 
 t_2 = repl_1k $ do
     x :: Int32 <- des
     y :: Int32 <- des
-    static_return ( x, y )
+    return ( x, y )
 
 t_3 = repl_1k $ do
     x :: Int32 <- des
     y :: Int32 <- des
-    static_return ()
+    return ()
 
 t_4 = repl_1k $ do
     _ :: Int32 <- des
@@ -56,7 +56,7 @@ t_4 = repl_1k $ do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    static_return ()
+    return ()
 
 t_5 = repl_1k $ do
     _ :: Int32 <- des
@@ -71,7 +71,7 @@ t_5 = repl_1k $ do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    static_return ()
+    return ()
 
 t_6 = repl_1k $ do
     _ :: Int32 <- des
@@ -89,7 +89,7 @@ t_6 = repl_1k $ do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    static_return ()
+    return ()
 
 #if !ONLY_SMALL_CASES
 t_7 = repl_1k $ do
@@ -97,7 +97,7 @@ t_7 = repl_1k $ do
     t_6
     t_6
     t_6
-    static_return ()
+    return ()
 #endif
 
 main = run_test $ do

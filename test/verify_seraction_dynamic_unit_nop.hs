@@ -24,7 +24,7 @@ import System.IO
 
 static_ser = do 
     ser (0 :: Int32)
-    static_return ()
+    return ()
 
 t_0 i = do
     replicateM_ i $ dyn_action $ do

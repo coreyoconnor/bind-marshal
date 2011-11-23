@@ -19,7 +19,7 @@ des_char_8 :: XXX
 #endif
 des_char_8 = do
     v :: Word8 <- des
-    static_return $! toEnum $! fromEnum v
+    return $! toEnum $! fromEnum v
 
 {-# INLINE expect #-}
 #if RELEASE_BUILD
@@ -28,6 +28,6 @@ expect :: XXX
 expect v d msg = do
     v_actual <- d
     if v == v_actual
-        then static_return ()
+        then returnM ()
         else fail msg
 

@@ -31,7 +31,7 @@ import System.IO
 
 t_static = do
     _ :: Word32 <- des
-    static_return ()
+    return ()
 
 -- case # | lhs type | lhs pre | lhs post | rhs type | rhs pre | rhs post | fr | gr |
 -- ----------------------------------------------------------------------------------
@@ -62,37 +62,33 @@ t_static = do
 
 dyn_no_pre_no_post = dyn_action $ do
     _ :: Word32 <- des
-    static_return ()
+    return ()
 
 dyn_no_pre_w_post = do
     dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
+        return ()
     _ :: Word8 <- des
-    static_return ()
+    return ()
 
 dyn_w_pre_no_post = do
     _ :: Word16 <- des
     dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
+        return ()
 
 dyn_w_pre_w_post = do
     _ :: Word16 <- des
     dyn_action $ do
         _ :: Word32 <- des
-        static_return ()
+        return ()
     _ :: Word8 <- des
-    static_return ()
+    return ()
 
 static_non_zero = do
     _ :: Word32 <- des
     _ :: Word16 <- des
-    static_return ()
-
-static_zero = do
-    () <- des
-    static_return ()
+    return ()
 
 t_1_expected = [ GenBuffer 4 t_1_size
                , FinalizeBuffer t_1_size
