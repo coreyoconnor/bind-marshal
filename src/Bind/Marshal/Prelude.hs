@@ -53,25 +53,17 @@ import Foreign.Ptr
 
 import System.IO
 
+-- use the standard ifThenElse for now. 
+-- XXX: Add a version that handles static actions more optimaly.
 ifThenElse True   e1 _e2 = e1
 ifThenElse False _e1  e2 = e2
 
--- type Size = CSize
--- XXXX
--- type Size = Word64
+-- | Type for size in bytes.
+--
+-- Just an alias of Int. Which does limit the size below the actual max size that a system could
+-- represent. Not enough of a limitation to care right now.
 type Size = Int
 
-data Length = Length 
-    { unLength :: Size
-    }
-    deriving ( Show, Eq, Ord )
-
-instance ReifiesTo Nil Length where
-    reify _ = Length 0
-
-instance ReifiesTo tSeq Length => ReifiesTo (Cons t tSeq) Length where
-    reify _ = let reify_ :: tSeq -> Length = reify
-              in Length $! 1 + (unLength $! reify_ undefined)
-
+-- | Buffer regions use a BytePtr to represent the start of the region.
 type BytePtr = Ptr Word8
 

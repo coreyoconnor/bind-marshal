@@ -24,20 +24,29 @@ import GHC.Prim
 -- buffer actions.
 type family BufferReq action
 
+-- | All static memory actions act on a buffer region. 
+--
+-- The tag type variable differentiates buffers being serialized to versus deserialized from.
 data BufferRegion tag = BufferRegion 
     { buffer_region_start :: {-# UNPACK #-} !BytePtr
     , buffer_region_size :: {-# UNPACK #-} !Size
     } 
 
-{-# INLINE buffer_region_end #-}
+-- | returns the pointer to the end of the BufferRegion
 buffer_region_end :: BufferRegion tag -> BytePtr
 buffer_region_end (BufferRegion start size) = start `plusPtr` size
 
-{-# INLINE pop_bytes #-}
+{-# INLINE buffer_region_end #-}
+
+-- | Produces a new buffer region that skips the given number of bytes of the given buffer.
+--
+-- XXX: Really should be named drop_bytes instead of pop_bytes
 pop_bytes :: BufferRegion tag -> Size -> BufferRegion tag
 pop_bytes (BufferRegion start size) !to_pop 
     = BufferRegion (start `plusPtr` to_pop)
                    (size - to_pop)
+
+{-# INLINE pop_bytes #-}
 
 instance NFData (BufferRegion tag) where
     rnf (BufferRegion !start !size) = ()
