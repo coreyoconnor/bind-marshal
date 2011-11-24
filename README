@@ -55,3 +55,13 @@ should be automatic, but I have thus failed to get automatic lifting to work as 
 the user has to manually insert dyn_action when needed. However, if the dyn_action is ommited the
 equation will fail to type check. 
 
+Handling of failures is done incorrectly right now. The static memory actions have a failure
+continuation. The dynamic memory actions do not have a failure continuation: Any failure results in
+an IO exception. For a smooth implementation of an interface like Control.Applicative.Alternative 
+all failures should be propogated via a failure continuation. 
+
+Consistently using a failure continuation for error popogation does not resolve all issues with
+error handling. A pattern match failure followed by a "return _ :: Identity _" will use the fail
+equation for Identity (Prelude.error). This may not be what the user expects. So IO exception will
+still need to be handled and forwarded to the failure continuation when appropriate.
+

@@ -87,29 +87,12 @@ import GHC.Exts
 
 import System.IO
 
--- | The return instance is only currently defined as a sealed action. 
+-- | The return instance is only currently defined for a sealed action. 
 --
 -- XXX Add a more generic return instance.
 instance BufferDelegate bd => Return (DynAction_ Sealed Sealed Sealed bd tag) where
     {-# INLINE returnM #-}
-    returnM v = SealedSealedAction (\ eval_cont -> eval_cont v)
-
--- | Currently only a DynamicDesAction without a tail or a head data model can be used as a
--- non-parameterized monad. I would like to be able to automatically lift any other DynamicDesAction
--- via dyn_action when a non-parameterized monad is required, but I have been stymied attempting to
--- do so.
-instance BufferDelegate bd => BaseMonad.Monad (DynAction_ Sealed Sealed Sealed bd tag) where
-    {-# INLINE return #-}
-    return v = SealedSealedAction (\ eval_cont -> eval_cont v )
-    {-# INLINE (>>=) #-}
-    (>>=) (SealedSealedAction ma) fmb = SealedSealedAction 
-        ( \ eval_cont -> ma (\v -> case fmb v of
-                                SealedSealedAction mb -> mb eval_cont
-                           )
-        )
-    {-# INLINE (>>) #-}
-    (>>) (SealedSealedAction ma) (SealedSealedAction mb) 
-        = SealedSealedAction ( \ eval_cont -> ma (const $! mb eval_cont) )
+    returnM v = SealedSealedAction (\eval_cont -> eval_cont v)
 
 {-# INLINE returnM_v_i #-}
 returnM_v_i :: a -> Iter -> IO (a, Iter)
@@ -745,6 +728,21 @@ dyn_fail :: forall bd tag a . BufferDelegate bd
             => String -> DynAction_ Sealed Sealed Sealed bd tag a
 dyn_fail = fail
 
+-- | Currently only a DynamicDesAction without a tail or a head data model can be used as a
+-- non-parameterized monad. I would like to be able to automatically lift any other DynamicDesAction
+-- via dyn_action when a non-parameterized monad is required, but I have been stymied attempting to
+-- do so.
+instance BufferDelegate bd => BaseMonad.Monad (DynAction_ Sealed Sealed Sealed bd tag) where
+    {-# INLINE return #-}
+    return v 
+        = SealedSealedAction (\eval_cont -> eval_cont v )
+    {-# INLINE (>>=) #-}
+    (>>=) (SealedSealedAction ma) fmb 
+        = SealedSealedAction ( ma . eval_fss fmb )
+    {-# INLINE (>>) #-}
+    (>>) (SealedSealedAction ma) (SealedSealedAction mb) 
+        = SealedSealedAction ( ma . const . mb )
+
 -- | Converts an action to a sealed dynamic memory action value. Possibly inserts gen_region or
 -- finalize_region passes.
 class SealedDynAction (action :: * -> *) bd where
@@ -763,10 +761,7 @@ instance ( bd_1 ~ bd_0
     dyn_action (SealedSealedAction a) = SealedSealedAction a
 
 
--- | a dynamic block that already has an empty tail and a DMNil pre model can be trivially lifted to
--- a fixed dynamic block.
---
--- XXX: Any easier way to unify the input type parameter a with the action's type parameter a?
+-- | a static mem action can be lifted to a sealed dynamic action-
 instance ( BufferDelegate bd 
          , Nat size
          ) => SealedDynAction (StaticMemAction tag size) bd where
@@ -776,9 +771,9 @@ instance ( BufferDelegate bd
         !required_size -> SealedSealedAction 
             ( \ eval_cont !bd_iter -> do
                     !bd_iter' <- resolve_iter required_size bd_iter
-                    -- (# !v, p' #) <- inline $! ma (\ !v !p' -> returnM (# v, p' #)) fail (curr_addr bd_iter')
-                    -- eval_cont v ( bd_iter' { curr_addr = p' } )
-                    ma (\ !v !p' -> eval_cont v ( bd_iter' { curr_addr = p' } )) fail (curr_addr bd_iter')
+                    ma (\ !v !p' -> eval_cont v ( bd_iter' { curr_addr = p' } )) 
+                       fail 
+                       (curr_addr bd_iter')
             )
     
 instance ( BufferDelegate bd_1
