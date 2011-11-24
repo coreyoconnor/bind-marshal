@@ -52,7 +52,7 @@ io_eval_static (StaticMemAction ma) (Ptr !p)
 
 instance Functor ( StaticMemAction buffer_iter_tag size ) where
     {-# INLINABLE fmap #-}
-    fmap f (StaticMemAction ma) = StaticMemAction ( ma . (. f) ) 
+    fmap f (StaticMemAction ma) = StaticMemAction (\eval_cont ->  ma (eval_cont . f) ) 
 
 {- I would like to express a memory action monad using a single generic parameter. Then only
  - reference the particular type parameter holes via type equations.

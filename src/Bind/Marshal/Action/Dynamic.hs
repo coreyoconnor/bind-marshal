@@ -241,7 +241,7 @@ data instance DynAction_ (Open n_0)
 
 instance Functor (DynAction_ Sealed Sealed Sealed bd tag) where
     fmap f (SealedSealedAction ma) 
-        = SealedSealedAction ( \eval_cont -> ma (\v_0 -> eval_cont (f v_0)) ) 
+        = SealedSealedAction (\eval_cont -> ma ( eval_cont . f ) ) 
 
 instance Functor (DynAction_ Sealed post_ra (Open n) bd tag) where
     fmap (f :: v_1 -> v_2) (SealedOpenAction ma post) 
@@ -264,3 +264,4 @@ instance Functor (DynAction_ (Open n_1) post_ra (Open n_0) bd tag) where
                             (!v_1, !iter_1) <- post v_0 iter_0
                             returnM (f v_1, iter_1) :: IO (v_2, Iter)
                          )
+
