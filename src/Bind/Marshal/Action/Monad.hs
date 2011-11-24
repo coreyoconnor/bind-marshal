@@ -3,109 +3,7 @@
 
 {-# LANGUAGE UnboxedTuples #-}
 {-# LANGUAGE MagicHash #-}
-module Bind.Marshal.Action.Monad ( module Bind.Marshal.Action.Monad
-                                 , module Bind.Marshal.Action.Monad.Static
-                                 ) 
-    where
-
-import Bind.Marshal.Prelude
-
-import Bind.Marshal.Action.Base
-import Bind.Marshal.Action.Static
-import Bind.Marshal.Action.Dynamic
-import Bind.Marshal.Action.Monad.Static
-import Bind.Marshal.DataModel
-import Bind.Marshal.StaticProperties
-
-import qualified Control.Monad as BaseMonad
-
-import Data.Strict.Either
-import Data.Strict.Tuple
-
-import Foreign.Ptr
-
-import GHC.Exts
-
-import System.IO
-
--- | The return instance is only currently defined as a sealed action. 
---
--- XXX Add a more generic return instance.
-instance BufferDelegate bd => Return (DynAction_ Sealed Sealed Sealed bd tag) where
-    {-# INLINE returnM #-}
-    returnM v = SealedSealedAction (\ eval_cont -> eval_cont v)
-
--- | Currently only a DynamicDesAction without a tail or a head data model can be used as a
--- non-parameterized monad. I would like to be able to automatically lift any other DynamicDesAction
--- via dyn_action when a non-parameterized monad is required, but I have been stymied attempting to
--- do so.
-instance BufferDelegate bd => BaseMonad.Monad (DynAction_ Sealed Sealed Sealed bd tag) where
-    {-# INLINE return #-}
-    return v = SealedSealedAction (\ eval_cont -> eval_cont v )
-    {-# INLINE (>>=) #-}
-    (>>=) (SealedSealedAction ma) fmb = SealedSealedAction 
-        ( \ eval_cont -> ma (\v -> case fmb v of
-                                SealedSealedAction mb -> mb eval_cont
-                           )
-        )
-    {-# INLINE (>>) #-}
-    (>>) (SealedSealedAction ma) (SealedSealedAction mb) 
-        = SealedSealedAction ( \ eval_cont -> ma (const $! mb eval_cont) )
-
-{-# INLINE returnM_v_bd #-}
-returnM_v_bd :: a -> BDIter bd -> IO (a, BDIter bd)
-returnM_v_bd a !bd_iter = returnM (a, bd_iter)
-
-{-# INLINE returnM_v_i #-}
-returnM_v_i :: a -> Iter -> IO (a, Iter)
-returnM_v_i !a !iter = returnM (a, iter)
-
-{-# INLINE post_bind #-}
-post_bind p_0 p_1 = \ !a !iter -> do
-    (!b, !iter') <- p_0 a iter
-    p_1 b iter'
-
-{-# INLINE resolve_iter #-}
-resolve_iter :: BufferDelegate bd => Size -> BDIter bd -> IO (BDIter bd)
-resolve_iter 0              !bd_iter = returnM bd_iter
-resolve_iter !required_size !bd_iter = case max_bytes_final bd_iter of
-    0                -> case required_size > max_bytes_avail bd_iter of
-                            True -> gen_region required_size (buffer_delegate bd_iter)
-                            False -> returnM ( bd_iter { max_bytes_final = required_size } )
-    finalized_size   -> case required_size + finalized_size > max_bytes_avail bd_iter of
-                            True -> gen_region required_size =<< finalize_region bd_iter
-                            False -> returnM ( bd_iter { max_bytes_final = finalized_size + required_size } )
-
-{- A dynamic memory action bound to another dynamic memory action needs to account for buffering in
- - some cases.
- -
- - By some flimsy application of the monad laws it is sufficient to analyse only the following
- - equation to determine the rules for a dynamic action bound to another dynamic action:*
- -  pre_action >> post_action = equiv_action
- - 
- - Given: A dynamic action is provides the necessary buffering for the mid and post memory actions. 
- - 
- - No bind between two dynamic actions requires the insertion of buffering. All buffering is already
- - accounted for by the post_action's pre actions and the post_action's post actions. In this case the
- - post_action's pre_action IS the pre_actions' and therefor the required buffering is handled by
- - the pre_action.
- -
- - In the case where a pre_action is a static memory action no buffering needs to be inserted: The
- - post_action already accounts for the buffering required for it's execution. The pre_action does
- - not already account for the buffering required for it's execution however the buffering will be
- - inserted.
- -
- - In the case where a post_action is a static memory action buffer handling needs to be inserted
- e only if the pre_action is a dynamic action which has an empty post action. If the dynamic action
- - does not have an empty post action then the buffering for the static action is already covered by
- - the dynamic action.
- -
- - * This assumes the dynamic action is a monad. However the rules we are deriving from analyzing
- - this equation effect whether or not a dynamic action is a monad. If the derived rules do not
- - suppor the monad laws then only analyzing that equation is insufficient.
- -}
-
--- dynamic actions can have none, one, or both of the attributes: pre_open ; post_open
+-- | dynamic actions can have none, one, or both of the attributes: pre_open ; post_open
 -- pre_open means that there is a non 0 sized pre buffer requirement.
 -- post_open means that there is a non 0 sized post buffer requirement.
 --
@@ -164,7 +62,103 @@ resolve_iter !required_size !bd_iter = case max_bytes_final bd_iter of
 -- unified with D0. I would expect a to be unified with D0 then the instance Foo D0 b chosen.
 --
 
--- case 1
+module Bind.Marshal.Action.Monad ( module Bind.Marshal.Action.Monad
+                                 , module Bind.Marshal.Action.Monad.Static
+                                 ) 
+    where
+
+import Bind.Marshal.Prelude
+
+import Bind.Marshal.Action.Base
+import Bind.Marshal.Action.Static
+import Bind.Marshal.Action.Dynamic
+import Bind.Marshal.Action.Monad.Static
+import Bind.Marshal.DataModel
+import Bind.Marshal.StaticProperties
+
+import qualified Control.Monad as BaseMonad
+
+import Data.Strict.Either
+import Data.Strict.Tuple
+
+import Foreign.Ptr
+
+import GHC.Exts
+
+import System.IO
+
+-- | The return instance is only currently defined as a sealed action. 
+--
+-- XXX Add a more generic return instance.
+instance BufferDelegate bd => Return (DynAction_ Sealed Sealed Sealed bd tag) where
+    {-# INLINE returnM #-}
+    returnM v = SealedSealedAction (\ eval_cont -> eval_cont v)
+
+-- | Currently only a DynamicDesAction without a tail or a head data model can be used as a
+-- non-parameterized monad. I would like to be able to automatically lift any other DynamicDesAction
+-- via dyn_action when a non-parameterized monad is required, but I have been stymied attempting to
+-- do so.
+instance BufferDelegate bd => BaseMonad.Monad (DynAction_ Sealed Sealed Sealed bd tag) where
+    {-# INLINE return #-}
+    return v = SealedSealedAction (\ eval_cont -> eval_cont v )
+    {-# INLINE (>>=) #-}
+    (>>=) (SealedSealedAction ma) fmb = SealedSealedAction 
+        ( \ eval_cont -> ma (\v -> case fmb v of
+                                SealedSealedAction mb -> mb eval_cont
+                           )
+        )
+    {-# INLINE (>>) #-}
+    (>>) (SealedSealedAction ma) (SealedSealedAction mb) 
+        = SealedSealedAction ( \ eval_cont -> ma (const $! mb eval_cont) )
+
+{-# INLINE returnM_v_i #-}
+returnM_v_i :: a -> Iter -> IO (a, Iter)
+returnM_v_i !a !iter = returnM (a, iter)
+
+{-# INLINE resolve_iter #-}
+resolve_iter :: BufferDelegate bd => Size -> BDIter bd -> IO (BDIter bd)
+resolve_iter 0              !bd_iter = returnM bd_iter
+resolve_iter !required_size !bd_iter = case max_bytes_final bd_iter of
+    0                -> case required_size > max_bytes_avail bd_iter of
+                            True -> gen_region required_size (buffer_delegate bd_iter)
+                            False -> returnM ( bd_iter { max_bytes_final = required_size } )
+    finalized_size   -> case required_size + finalized_size > max_bytes_avail bd_iter of
+                            True -> gen_region required_size =<< finalize_region bd_iter
+                            False -> returnM ( bd_iter { max_bytes_final = finalized_size + required_size } )
+
+{- A dynamic memory action bound to another dynamic memory action needs to account for buffering in
+ - some cases.
+ -
+ - By some flimsy application of the monad laws it is sufficient to analyse only the following
+ - equation to determine the rules for a dynamic action bound to another dynamic action:*
+ -  pre_action >> post_action = equiv_action
+ - 
+ - Given: A dynamic action is provides the necessary buffering for the mid and post memory actions. 
+ - 
+ - No bind between two dynamic actions requires the insertion of buffering. All buffering is already
+ - accounted for by the post_action's pre actions and the post_action's post actions. In this case the
+ - post_action's pre_action IS the pre_actions' and therefor the required buffering is handled by
+ - the pre_action.
+ -
+ - In the case where a pre_action is a static memory action no buffering needs to be inserted: The
+ - post_action already accounts for the buffering required for it's execution. The pre_action does
+ - not already account for the buffering required for it's execution however the buffering will be
+ - inserted.
+ -
+ - In the case where a post_action is a static memory action buffer handling needs to be inserted
+ e only if the pre_action is a dynamic action which has an empty post action. If the dynamic action
+ - does not have an empty post action then the buffering for the static action is already covered by
+ - the dynamic action.
+ -
+ - * This assumes the dynamic action is a monad. However the rules we are deriving from analyzing
+ - this equation effect whether or not a dynamic action is a monad. If the derived rules do not
+ - suppor the monad laws then only analyzing that equation is insufficient.
+ -}
+
+eval_fss fss eval_cont v = case fss v of
+    SealedSealedAction ss -> ss eval_cont
+
+-- | case 1
 instance ( bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , tag_2 ~ tag_0
@@ -175,12 +169,10 @@ instance ( bd_2 ~ bd_0
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedSealedAction ma) fmb = SealedSealedAction 
-        ( \ eval_cont -> ma (\v -> case fmb v of
-                                SealedSealedAction mb -> mb eval_cont
-                           )
+        ( \ eval_cont -> ma ( eval_fss fmb eval_cont )
         )
 
--- case 2
+-- | case 2
 instance ( post_s_0  ~ post_sa_0
          , BufferDelegate bd_2
          , bd_2 ~ bd_0
@@ -193,13 +185,11 @@ instance ( post_s_0  ~ post_sa_0
     where
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma post) fmb = SealedSealedAction 
-        ( \ eval_cont -> ma post (\v -> case fmb v of
-                                    SealedSealedAction mb -> mb eval_cont
-                                )
+        ( \ eval_cont -> ma post ( eval_fss fmb eval_cont )
         )
             
 
--- case 3
+-- | case 3
 instance ( pre_s_2   ~ pre_s_0
          , tag_2 ~ tag_0
          , tag_2 ~ tag_1
@@ -213,13 +203,10 @@ instance ( pre_s_2   ~ pre_s_0
     (>>=) (OpenSealedAction pre_accum ma) fmb = OpenSealedAction
         pre_accum
         (\ pre eval_cont -> 
-            ma pre 
-               (\v -> case fmb v of
-                    SealedSealedAction mb -> mb eval_cont
-               )
+            ma pre ( eval_fss fmb eval_cont )
         )
             
--- case 4
+-- | case 4
 instance ( pre_s_2   ~ pre_s_0
          , post_s_0  ~ post_sa_0
          , tag_2 ~ tag_0
@@ -236,13 +223,11 @@ instance ( pre_s_2   ~ pre_s_0
         (\ pre_final eval_cont -> 
             ma pre_final 
                post 
-               (\a -> case fmb a of
-                        SealedSealedAction mb -> mb eval_cont
-               )
+               ( eval_fss fmb eval_cont )
         )
 
 
--- case 5
+-- | case 5
 instance ( pre_s_2 ~ static_size
          , tag_2 ~ tag_0
          , tag_2 ~ tag_1
@@ -261,7 +246,20 @@ instance ( pre_s_2 ~ static_size
                 SealedSealedAction mb -> mb eval_cont (bd_iter {curr_addr = p'})
         )
 
--- case 6
+{-# INLINE returnM_v_bd #-}
+returnM_v_bd :: a -> BDIter bd -> IO (a, BDIter bd)
+returnM_v_bd a !bd_iter = returnM (a, bd_iter)
+
+{-# INLINE post_bind #-}
+post_bind p_0 p_1 = \ !a !iter -> do
+    (!b, !iter') <- p_0 a iter
+    p_1 b iter'
+
+eval_fso fso post eval_cont !bd_iter v = case fso v of
+    SealedOpenAction m m_post -> m (m_post `post_bind` post)
+                                   eval_cont
+                                   bd_iter
+-- | case 6
 instance ( post_sa_2 ~ post_sa_1
          , post_s_2  ~ post_s_1
          , tag_2 ~ tag_0
@@ -269,7 +267,7 @@ instance ( post_sa_2 ~ post_sa_1
          , bd_2 ~ bd_0
          , bd_2 ~ bd_1
          , BufferDelegate bd_2
-         ) => Bind (DynAction_ Sealed Sealed Sealed bd_0 tag_0) 
+         ) => Bind (DynAction_ Sealed Sealed           Sealed          bd_0 tag_0) 
                    (DynAction_ Sealed (Open post_sa_1) (Open post_s_1) bd_1 tag_1) 
                    (DynAction_ Sealed (Open post_sa_2) (Open post_s_2) bd_2 tag_2)
     where
@@ -279,11 +277,7 @@ instance ( post_sa_2 ~ post_sa_1
            (eval_cont :: c -> BDIter bd_2 -> IO d)
            !bd_iter -> do
                 (a, !bd_iter') <- ma returnM_v_bd bd_iter
-                case fmb a of 
-                    SealedOpenAction mb mb_post -> do
-                        mb (mb_post `post_bind` post)
-                           eval_cont           
-                           bd_iter'
+                eval_fso fmb post eval_cont bd_iter' a
         )
         returnM_v_i
         
@@ -306,11 +300,8 @@ instance ( post_sa_2 ~ post_sa_1
         (\ post
            (eval_cont :: c -> BDIter bd_2 -> IO d)
            !bd_iter -> do
-                (a, !bd_iter') <- ma ma_post (\a !bd_iter' -> returnM (a, bd_iter')) bd_iter
-                case fmb a of 
-                    SealedOpenAction mb mb_post -> mb (mb_post `post_bind` post)
-                                                      eval_cont
-                                                      bd_iter'
+                (a, !bd_iter') <- ma ma_post returnM_v_bd bd_iter
+                eval_fso fmb post eval_cont bd_iter' a
         )
         returnM_v_i
 
@@ -334,11 +325,8 @@ instance ( pre_s_2   ~ pre_s_0
            post 
            (eval_cont :: c -> BDIter bd_2 -> IO d)
            !bd_iter -> do
-                (a, !bd_iter') <- ma pre (\a !bd_iter' -> returnM (a, bd_iter')) bd_iter
-                case fmb a of 
-                    SealedOpenAction mb mb_post -> mb (mb_post `post_bind` post)
-                                                      eval_cont
-                                                      bd_iter'
+                (a, !bd_iter') <- ma pre returnM_v_bd bd_iter
+                eval_fso fmb post eval_cont bd_iter' a
         )
         returnM_v_i
 
@@ -363,11 +351,8 @@ instance ( pre_s_2   ~ pre_s_0
            post
            (eval_cont :: c -> BDIter bd_2 -> IO d)
            !bd_iter -> do
-                (a, !bd_iter') <- ma pre ma_post (\a !bd_iter' -> returnM (a, bd_iter')) bd_iter
-                case fmb a of
-                    SealedOpenAction mb mb_post -> mb (mb_post `post_bind` post)
-                                                      eval_cont
-                                                      bd_iter'
+                (a, !bd_iter') <- ma pre ma_post returnM_v_bd bd_iter
+                eval_fso fmb post eval_cont bd_iter' a
         )
         returnM_v_i
 
@@ -392,10 +377,7 @@ instance ( pre_s_2   ~ static_size
                !bd_iter -> do
                     (!a, (Ptr p')) <- pre (Ptr (curr_addr bd_iter))
                     let !bd_iter' = bd_iter { curr_addr = p' }
-                    case fmb a of
-                        SealedOpenAction mb mb_post -> mb (mb_post `post_bind` post)
-                                                          eval_cont
-                                                          bd_iter'
+                    eval_fso fmb post eval_cont bd_iter' a
             )
             returnM_v_i
 
@@ -414,7 +396,7 @@ instance ( Nat pre_s_1
     (>>=) (SealedSealedAction ma) fmb = case toInt (undefined :: pre_s_1) of
         !required_size -> SealedSealedAction
             (\ eval_cont !bd_iter -> do
-                (a, !bd_iter') <- ma (\a !bd_iter' -> returnM (a, bd_iter')) bd_iter
+                (a, !bd_iter') <- ma returnM_v_bd bd_iter
                 case fmb a of
                     OpenSealedAction pre mb -> mb pre eval_cont =<< resolve_iter required_size bd_iter'
             )
@@ -433,7 +415,7 @@ instance ( post_s_0  ~ Add post_sa_0 pre_s_1
     {-# INLINE (>>=) #-}
     (>>=) (SealedOpenAction ma post) fmb = SealedSealedAction
         (\ eval_cont !bd_iter -> do
-            (a, !bd_iter') <- ma post (\a !bd_iter' -> returnM (a, bd_iter')) bd_iter
+            (a, !bd_iter') <- ma post returnM_v_bd bd_iter
             case fmb a of
                 OpenSealedAction pre mb -> mb pre eval_cont bd_iter'
         )
@@ -480,7 +462,7 @@ instance ( pre_s_2   ~ pre_s_0
         (\ pre
            eval_cont
            !bd_iter -> do
-                (a, !bd_iter') <- ma pre ma_post (\a !bd_iter' -> returnM (a, bd_iter')) bd_iter
+                (a, !bd_iter') <- ma pre ma_post returnM_v_bd bd_iter
                 case fmb a of
                     OpenSealedAction mb_pre mb -> mb mb_pre eval_cont bd_iter'
         )
@@ -523,7 +505,7 @@ instance ( post_sa_2 ~ post_sa_1
             (\ post
                eval_cont
                !bd_iter -> do
-                    (a, !bd_iter') <- ma (\a bd_iter' -> returnM (a, bd_iter')) bd_iter
+                    (a, !bd_iter') <- ma returnM_v_bd bd_iter
                     case fmb a of
                         OpenOpenAction mb_pre mb mb_post ->
                             mb mb_pre
