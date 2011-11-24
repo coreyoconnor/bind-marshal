@@ -29,15 +29,22 @@ instance ( m ~ D0
          => Return (StaticMemAction tag m)
     where
     {-# INLINE returnM #-}
-    returnM !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
+    returnM !v = StaticMemAction (s_eval_path v)  
+
+s_eval_path :: forall a c 
+               .  a 
+               -> ( a -> StaticIter c )
+               -> ( String -> IO c )
+               -> StaticIter c
+s_eval_path !a eval_cont _fail_cont = eval_cont a
 
 -- | Like return but it pads the buffer req by a given amount
 --
 -- This is safe for use in both deserialization and serialization actions.
 -- This does not change the position for the next serialization or deserialization. This only
 -- increases the type level buffer requirement.
-return_padded :: Nat n => n -> a -> StaticMemAction tag n a
-return_padded _ !v = StaticMemAction ( \ eval_cont _fail_cont -> eval_cont v )
+return_padded :: forall n a tag . Nat n => n -> a -> StaticMemAction tag n a
+return_padded _ !v = StaticMemAction ( s_eval_path v )
 
 -- | possibly-failing pattern matches require a Fail instance.
 instance Fail ( StaticMemAction tag
@@ -68,7 +75,7 @@ instance ( size_2 ~ Add size_0 size_1
 
     {-# INLINE (>>) #-}
     (>>) (StaticMemAction ma) (StaticMemAction mb) 
-        = StaticMemAction ( \ eval_cont fail_cont -> ma (\ !v -> mb eval_cont fail_cont ) 
+        = StaticMemAction ( \ eval_cont fail_cont -> ma (\ _ -> mb eval_cont fail_cont ) 
                                                         fail_cont
                           )
 

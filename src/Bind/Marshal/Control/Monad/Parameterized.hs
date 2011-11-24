@@ -163,9 +163,7 @@ infixr 1  =<<
 return :: a -> Identity a
 return = Old.return
 
-{-# RULES
-    "return equiv" forall a . return a = Old.return a
-  #-}
+{-# INLINE return #-}
 
 -- | Restrict the cases where we allow pattern matching to `fail`. You have to explicitly supply this for your `Monad`
 class Fail m where
@@ -181,6 +179,10 @@ instance Functor a => Bind Identity a a 	where m >>= f = f (runIdentity m)
 instance Functor a => Bind a Identity a 	where m >>= f = fmap (runIdentity . f) m
 instance Bind Identity Identity Identity 	where m >>= f = f (runIdentity m)
 
+-- | fail int he identity monad is equivalent to Prelude.error
+--
+-- XXX: This is not ideal. This forces all monads that bind with the identity monad to handle
+-- exceptions around the itentity computation.
 instance Fail Identity where
     fail msg = error msg
 
