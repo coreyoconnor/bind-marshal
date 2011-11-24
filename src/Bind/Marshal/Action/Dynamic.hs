@@ -199,7 +199,7 @@ data instance DynAction_ Sealed
                          tag
                          a 
                     where
-    SealedOpenAction :: forall post_ra a b n bd tag . BufferDelegate bd
+    SealedOpenAction :: forall post_ra n bd tag a b . BufferDelegate bd
                         => ( forall c d . ( a -> Iter -> IO (c, Iter) )
                              -> ( c -> BDIter bd -> IO d )
                              -> BDIter bd -> IO d
@@ -240,22 +240,27 @@ data instance DynAction_ (Open n_0)
                       -> DynAction_ (Open n_0) post_ra (Open n_1) bd tag e
 
 instance Functor (DynAction_ Sealed Sealed Sealed bd tag) where
-    fmap f (SealedSealedAction a) 
-        = SealedSealedAction ( \eval_cont -> a (\v -> eval_cont (f v)) ) 
+    fmap f (SealedSealedAction ma) 
+        = SealedSealedAction ( \eval_cont -> ma (\v_0 -> eval_cont (f v_0)) ) 
 
 instance Functor (DynAction_ Sealed post_ra (Open n) bd tag) where
-    fmap (f :: b -> b') (SealedOpenAction ma post) 
+    fmap (f :: v_1 -> v_2) (SealedOpenAction ma post) 
         = SealedOpenAction ma
-                           (\a !iter -> do
-                            (!b, !iter') <- post a iter 
-                            returnM (f b, iter') :: IO (b', Iter)
+                           (\v_0 !iter_0 -> do
+                            (!v_1, !iter_1) <- post v_0 iter_0
+                            returnM (f v_1, iter_1) :: IO (v_2, Iter)
                            )
 
 instance Functor (DynAction_ (Open n) post_ra Sealed bd tag) where
-    fmap f (OpenSealedAction pre a) 
-        = undefined
+    fmap f (OpenSealedAction pre_accum ma) 
+        = OpenSealedAction pre_accum 
+                           (\pre eval_cont -> ma pre ( eval_cont . f ) )
 
 instance Functor (DynAction_ (Open n_1) post_ra (Open n_0) bd tag) where
-    fmap f (OpenOpenAction pre a post) 
-        = undefined
-
+    fmap (f :: v_1 -> v_2) (OpenOpenAction pre_accum ma post) 
+        = OpenOpenAction pre_accum 
+                         ma
+                         (\v_0 !iter_0 -> do
+                            (!v_1, !iter_1) <- post v_0 iter_0
+                            returnM (f v_1, iter_1) :: IO (v_2, Iter)
+                         )
