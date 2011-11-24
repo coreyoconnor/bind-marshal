@@ -15,7 +15,7 @@ import Bind.Marshal.StdLib.Utils.Ser
 
 import FLVHeader.Data
  
-{-# INLINE ser_flv_header #-}
+{-# INLINABLE ser_flv_header #-}
 ser_flv_header h = do
     ser_char_8 'F'
     ser_char_8 'L'

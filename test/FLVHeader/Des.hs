@@ -29,7 +29,7 @@ import Data.Bits ( testBit )
 --
 -- For larger data marshalling procedures the cost of not inlining the final continuation will be
 -- negligable.
-{-# INLINE des_flv_header #-}
+{-# INLINABLE des_flv_header #-}
 des_flv_header = do
     -- Sometimes, when I fiddle with the type equations, the following fails to typecheck:
 #if FLVHEADER_DES_IDEAL_CASE

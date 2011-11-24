@@ -31,6 +31,15 @@ import System.Random ( newStdGen, split )
 
 import Test.QuickCheck.Gen ( Gen(..) )
 
+-- XXX: In the bench_storable case the compiler is smart enough to know that the deserialized FLV
+-- header does not matter*. Thus the allocation of the FLVHeader is never performed. In the
+-- bench_des case the compiler does not eliminate the allocation of the deserialized FLVHeader. This
+-- makes for an incorrect performance comparison.
+--
+-- That said. Should the fact that the compiler is unable to determine the FLVHeader is not actually
+-- used int he bench_des case be considered an issue?
+--
+-- * in the case where the fields of FLVHeader are valid; Will not cause an exception when seq'd
 {-# NOINLINE bench_des #-}
 bench_des des_buf () = do
     let des = apply_des_to_fixed_buffer_unsafe des_flv_header
