@@ -128,14 +128,6 @@ import GHC.Prim
 
 import System.IO
 
--- | All Dynamic memory actions have either a sealed buffer size requirement or an open buffer size
--- requirement. 
-data Sealed
-
--- | An open buffering requirement means that the pre-buffering or post-buffering requirement is not
--- handled by the dynamic memory action.
-data Open n
-
 -- | A dynamic memory action a buffer handler action optionally paired with a statically defined pre
 -- buffer action and/or post buffer action.
 --

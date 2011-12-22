@@ -2,9 +2,8 @@
 -- License     :  BSD-style (see the file LICENSE)
 
 {-# LANGUAGE EmptyDataDecls #-}
-{- Type and value representation of a data model.
- -
- - The type level data model is refered to by tModel in type level equations.
+{- | The data model of a memory action describe the buffering requirements of the action. The
+ - buffering requirements are considered either Static or Dynamic.
  -}
 module Bind.Marshal.DataModel ( module Bind.Marshal.DataModel
                               , module Bind.Marshal.DataModel.Base
@@ -13,59 +12,49 @@ where
 
 import Bind.Marshal.Prelude
 
-import Bind.Marshal.DataModel.Base
-
-import Data.List ( length )
-
-import qualified Control.Monad as Monad
-
--- The data model of an expression is a static description of the memory structure required by the
--- expression. The structure is described by a sequence of actions that depend on a linear
--- memory region.
+-- | One class of memory actions are those that act on a memory region with a statically defined
+-- size.
 --
--- Type level representation of a data model.
--- A "data model" is a sequence of buffer-static actions.
--- A buffer-static action is an action that operates on a memory region of a statically known size.
--- 
--- The sequence of buffer-static actions is statically defined by:
---  containing a dynamically repeated term.
---  containing a statically repeated term
--- 
--- A term may be a buffer-static action.
-
--- - If a dyn action is replicated then the result is also a dynamic action.
-
-{- Value level representation of a data model. This is used for dynamic introspection. Currently the
- - data model is a record of all data model influencing actions contained in the action monad.
- -}
-data DynamicModel = DynamicModel 
-    { action_seq :: ActionSeq
-    }
-data ActionSeq -- XXX
-    
--- Current descriptions of the memory regions that compose a data model:
---  - deserialization of a type with a constant marshalled size
---  - serialization of a type with a constant marshalled size
-data ActionDesc 
-    = DesAction Size
-    | SerAction Size
-
--- Complete model representation. Contains both the value level and type level representations.
-data Model tModel = Model 
-    { dynamic_model :: DynamicModel
-    }
-
--- The constraint IsStaticModel verifies the deserialization scheme of apply_des_to_fixed_buffer is
--- applicable. The scheme assumes two things:
--- 1. The buffer is large enough to support all the deserialization actions performed in "action"
--- 2. The action's deserialization actions are statically fixed.
+-- For serialization actions this would represent the maximum number of bytes that could be output
+-- by the action. For deserialization actions this would be the maximum number of bytes that would
+-- be read from.
 --
--- H: It is sufficient to match against the head of the serialization sequence. The rest of the
--- serialization sequence is already assured to be static iff the head is static due to the rules of
--- the DMApp equation.
+-- This system behaves optimally when actions act on exactly max_buffer_req bytes and not less.  For
+-- instance: Suppose the current memory region is smaller than the max_buffer_req of a
+-- deserialization action. Applying the action to the memory region could still succeed without
+-- failure: So long as the action never read beyond the actual memory region bounds.
+-- In bind-marshal this case triggers a slow path: A new memory region of the max size is allocated
+-- and the deserialization action is applied to this new region. If the deserialization action was
+-- found to have read into bytes not defined by the original region then the action failed.
+-- Otherwise the new region is deallocated and the action's result is returned.
 --
--- XXX: Verify this constraint fails when applied to a dynamic buffer sequence.
+-- XXX: Resolve this by extending with a min buffer req.
+data Static max_buffer_req
+
+-- | An action that has buffering requirements that cannot be approximated by only a maximum size is
+-- considered dynamic. A dynamic action is represented by an action on a buffer delegate prefixed
+-- with a static action and followed by a static action.
 --
-type family IsStaticModel model
-type instance IsStaticModel (StaticModel size) = True
+-- The Dynamic type is parameterized by the buffering requirements of the static prefix and suffix.
+-- The static suffix requirement is split into post_req_accumulator and post_req. The first
+-- representing the suffix buffer requirement of this Dynamic action's suffix action. The second
+-- representing the suffix buffer requirement of the final Dynamic action this action was composed
+-- into.
+data Dynamic pre_req post_req_accumulator post_req
+             buffer_delegate
+
+-- | The prefix and suffix buffering requirements of a Dynamic memory actions are either sealed or
+-- open. A sealed requirement means the action accounts for the buffering requirements already.
+--
+-- XXX: See if this can be unified with NoAction
+data Sealed
+
+-- | An open buffering requirement means that the pre-buffering or post-buffering requirement is not
+-- handled by the dynamic memory action.
+--
+-- XXX: See if this can be unified with Static
+data Open max_buffer_req
+
+-- | There are also actions that do not act on a memory region at all. EG: return
+data NoAction
 

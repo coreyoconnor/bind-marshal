@@ -51,5 +51,13 @@ pop_bytes (BufferRegion start size) !to_pop
 instance NFData (BufferRegion tag) where
     rnf (BufferRegion !start !size) = ()
 
+-- | An iterator over a buffer is just a Word8 ptr.
 type Iter = Ptr Word8
 
+-- | An Action is a monad whose structure is determined by the buffering requirements. The tag
+-- prevents inappropriate mixing of serialization and deserialization actions.
+--
+-- The buffering requirement is described in Bind.Marshal.DataModel. 
+-- The tag is either Des or Ser. 
+data family Action buffering_req tag :: * -> *
+                   
