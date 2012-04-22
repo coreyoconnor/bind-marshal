@@ -15,7 +15,7 @@ main = project $ do
                     , "containers"
                     , "deepseq"
                     , "random"
-                    , "QuickCheck-2.4"
+                    , "QuickCheck"
                     , "type-level-tf-0.2.1"
                     , "ghc-prim"
                     , "strict"
