@@ -21,21 +21,21 @@ import System.IO
 
 t_0 = do 
     () <- des
-    returnM () 
+    return () 
 
 t_1 = do 
     y :: Int32 <- des 
-    returnM y
+    return y
 
 t_2 = do
     x :: Int32 <- des
     y :: Int32 <- des
-    returnM ( x, y )
+    return ( x, y )
 
 t_3 = do
     x :: Int32 <- des
     y :: Int32 <- des
-    returnM ()
+    return ()
 
 t_4 = do
     _ :: Int32 <- des
@@ -48,7 +48,7 @@ t_4 = do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    returnM ()
+    return ()
 
 t_5 = do
     _ :: Int32 <- des
@@ -63,7 +63,7 @@ t_5 = do
     _ :: Int32 <- des
     _ :: Int32 <- des
     _ :: Int32 <- des
-    returnM ()
+    return ()
 
 #if !ONLY_SMALL_CASES
 t_6 = do
@@ -82,7 +82,7 @@ t_6 = do
     a12 :: Int32 <- des
     a13 :: Int32 <- des
     a14 :: Int32 <- des
-    returnM ( a0 
+    return ( a0 
             + a1
             + a2
             + a3
@@ -104,7 +104,7 @@ t_7 = do
     b1 <- t_6
     b2 <- t_6
     b3 <- t_6
-    returnM ( b0 + b1 + b2 + b3)
+    return ( b0 + b1 + b2 + b3)
 
 #endif
 

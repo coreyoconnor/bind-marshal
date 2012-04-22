@@ -18,25 +18,25 @@ import System.IO
 
 t_0 = do
     ser ()
-    returnM ()
+    return ()
 
 t_1 = do
     ser ( 0 :: Word8 )
-    returnM ()
+    return ()
 
 t_2 (x :: Word8) = do
     ser x
-    returnM ()
+    return ()
 
 t_3 (x :: Word8) (y :: Word8) = do
     ser x
     ser y
-    returnM ()
+    return ()
 
 t_4 (x :: Word8) (y :: Word32) = do
     ser x
     ser y
-    returnM ()
+    return ()
 
 t_5 = do
     ser (0 :: Int32)
@@ -46,7 +46,7 @@ t_5 = do
     ser (4 :: Int32)
     ser (5 :: Word32)
     ser (6 :: Word32)
-    returnM ()
+    return ()
 
 #if !ONLY_SMALL_CASES
 t_6 = do
@@ -65,7 +65,7 @@ t_6 = do
     ser (12 :: Word8)
     ser (13 :: Word8)
     ser (14 :: Word8)
-    returnM ()
+    return ()
 
 t_7 a b c d e f g h i j k l m n o = do
     ser (a :: Int32)
@@ -83,7 +83,7 @@ t_7 a b c d e f g h i j k l m n o = do
     ser (m :: Word8)
     ser (n :: Word8)
     ser (o :: Word8)
-    returnM ()
+    return ()
 #endif
 
 main = run_test $ do

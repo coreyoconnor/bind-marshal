@@ -14,20 +14,14 @@ import Bind.Marshal.DesAction.Static
 import Bind.Marshal.StdLib.Des
 
 {-# INLINE des_char_8 #-}
-#if RELEASE_BUILD
-des_char_8 :: XXX
-#endif
 des_char_8 = do
     v :: Word8 <- des
     return $! toEnum $! fromEnum v
 
 {-# INLINE expect #-}
-#if RELEASE_BUILD
-expect :: XXX
-#endif
 expect v d msg = do
     v_actual <- d
     if v == v_actual
-        then returnM ()
+        then return ()
         else fail msg
 
