@@ -10,10 +10,12 @@ module Bind.Marshal.Prelude ( module Bind.Marshal.Prelude
                             , module Data.Char
                             , module Data.Eq
                             , module Data.Functor
-                            , module Data.List
                             , module Data.Int
+                            , module Data.List
+                            , module Data.Monoid
                             , module Data.String
                             , module Data.Word
+                            , module GHC.TypeLits
                             , module NumericPrelude.Numeric
                             , module System.IO
                             )
@@ -41,8 +43,9 @@ import Data.Bool
 import Data.Char
 import Data.Eq
 import Data.Functor
-import Data.List hiding ( product, sum )
 import Data.Int 
+import Data.List hiding ( product, sum )
+import Data.Monoid
 import Data.String
 import Data.Word
 
@@ -50,6 +53,8 @@ import NumericPrelude.Numeric
 
 import Foreign.C.Types ( CSize(..) )
 import Foreign.Ptr
+
+import GHC.TypeLits hiding ( isZero )
 
 import System.IO
 

@@ -4,28 +4,12 @@
 
 module Bind.Marshal.TypePrelude ( module Bind.Marshal.TypePrelude
                                 , module Data.TypeLevel.Bool
-                                , module Data.TypeLevel.Num.Aliases
-                                , module Data.TypeLevel.Num.Ops
-                                , module Data.TypeLevel.Num.Reps
-                                , module Data.TypeLevel.Num.Sets
                                 )
 where
 
 import Data.TypeLevel.Bool
 
--- Type level naturals based on Peano numbers
-import Data.TypeLevel.Num.Aliases
-import Data.TypeLevel.Num.Ops ( Pred(..)
-                              , Succ(..)
-                              , Add(..)
-                              , Sub(..)
-                              , Mul(..) 
-                              , Div(..)
-                              )
-import Data.TypeLevel.Num.Reps
-import Data.TypeLevel.Num.Sets
-
--- Type level lists.
+-- Basic type level lists.
 data Nil
 data Cons t ts
 

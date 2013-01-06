@@ -36,7 +36,7 @@ type StaticIter r = Addr# -> IO r
 
 -- | A buffer static memory action. An function that provides a StaticIter given a normal path
 -- function and failure path function.
-newtype StaticMemAction buffer_iter_tag size a = StaticMemAction
+newtype StaticMemAction buffer_iter_tag (size :: Nat) a = StaticMemAction
     { static_eval :: forall c
         .  ( a      -> StaticIter c ) -- normal path
         -> ( String -> IO c )         -- failure path

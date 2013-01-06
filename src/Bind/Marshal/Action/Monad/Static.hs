@@ -24,7 +24,7 @@ import GHC.Exts ( inline )
 -- In these cases return should be replaced by returnM with a type annotation fixing the monad type.
 -- EG: "dyn_action ( return () :: StaticDesAction D0 () )"
 --  
-instance ( m ~ D0
+instance ( m ~ 0
          )
          => Return (StaticMemAction tag m)
     where
@@ -43,7 +43,7 @@ s_eval_path !a eval_cont _fail_cont = eval_cont a
 -- This is safe for use in both deserialization and serialization actions.
 -- This does not change the position for the next serialization or deserialization. This only
 -- increases the type level buffer requirement.
-return_padded :: forall n a tag . Nat n => n -> a -> StaticMemAction tag n a
+return_padded :: forall n a tag . Sing n -> a -> StaticMemAction tag n a
 return_padded _ !v = StaticMemAction ( s_eval_path v )
 
 -- | possibly-failing pattern matches require a Fail instance.
@@ -56,7 +56,7 @@ instance Fail ( StaticMemAction tag
 
 -- | The static memory action monad is constructed via the parameterized monad Return and Bind
 -- instances.
-instance ( size_2 ~ Add size_0 size_1
+instance ( size_2 ~ (size_0 + size_1)
          , buffer_0 ~ buffer_1
          , buffer_0 ~ buffer_2
          ) => Bind (StaticMemAction buffer_0 size_0)
@@ -85,30 +85,51 @@ instance ( size_2 ~ Add size_0 size_1
 -- what the normal replicateM is for.
 --
 -- XXX: Unimplemented
-{-
-static_replicateM :: ( Pos n 
-                     , size_2 ~ Add size_0 (Mul n size_1)
-                     , Bind (StaticMemAction tag size_0)
-                            (StaticMemAction tag size_1)
-                            (StaticMemAction tag size_2)
-                     ) => n 
-                       -> StaticMemAction tag size_1  a
-                       -> StaticMemAction tag size_2 [a]
--}
-static_replicateM ( _ :: count ) f = case toInt ( undefined :: count ) of
-    n -> bounded_replicateM ( undefined :: count ) n f
+static_replicateM :: forall tag max_count total_size f_size a .
+                     ( SingI max_count
+                     , total_size ~ (max_count * f_size)
+                     , Monoid a
+                     ) => Sing max_count 
+                       -> StaticMemAction tag f_size a
+                       -> StaticMemAction tag total_size a
+static_replicateM ( _ :: Sing count ) f = case fromInteger $! fromSing (sing :: Sing max_count) of
+    n -> bounded_replicateM ( undefined :: Sing max_count ) n f
 
 -- | Like replicateM but the count is no more than n times where n is a type variable.
 --
 --
+-- XXX: Unimplemented
+bounded_replicateM :: forall tag max_count total_size f_size a .
+                      ( SingI max_count
+                      , total_size ~ (max_count * f_size)
+                      , Monoid a
+                      ) => Sing max_count
+                        -> Int
+                        -> StaticMemAction tag f_size a
+                        -> StaticMemAction tag total_size a
 bounded_replicateM _ count f = undefined
 
 -- | variant of static_replicateM that ignores the result of the action.
-static_replicateM_ ( _ :: count ) f = case toInt ( undefined :: count ) of
-    n -> bounded_replicateM_ ( undefined :: count ) n f
+-- XXX: Unimplemented
+static_replicateM_ :: forall tag max_count total_size f_size a .
+                      ( SingI max_count
+                      , total_size ~ (max_count * f_size)
+                      ) => Sing max_count 
+                        -> StaticMemAction tag f_size a
+                        -> StaticMemAction tag total_size ()
+static_replicateM_ _ f = case fromInteger $! fromSing (sing :: Sing max_count) of
+    n -> bounded_replicateM_ (sing :: Sing max_count) n f
 
 -- | variant of bounded_replicateM that ignores the result of the action.
-bounded_replicateM_ _ count f = undefined
+-- XXX: Unimplemented
+bounded_replicateM_ :: forall tag max_count total_size f_size a .
+                       ( SingI max_count
+                       , total_size ~ (max_count * f_size)
+                       ) => Sing max_count
+                         -> Int
+                         -> StaticMemAction tag f_size a
+                         -> StaticMemAction tag total_size ()
+bounded_replicateM_ (_ :: Sing max_count) count f = undefined
 
 -- | Accumulates using the provided static action accumulation function.
 --
@@ -116,14 +137,14 @@ bounded_replicateM_ _ count f = undefined
 -- XXX: Possible to provide loop unrolling through RULES? Possibly need *a lot*.
 {-# INLINE bounded_accum #-}
 bounded_accum :: forall tag a max_count f_size total_size .
-                 ( Nat max_count
-                 , total_size ~ Mul max_count f_size
-                 ) => max_count
+                 ( total_size ~ (max_count * f_size)
+                 , SingI max_count
+                 ) => Sing max_count
                    -> Int
                    -> ( a -> StaticMemAction tag f_size a )
                    -> a
                    -> StaticMemAction tag total_size a
-bounded_accum _ !count !f !a = case toInt ( undefined :: max_count ) of
+bounded_accum _ !count !f !a = case fromInteger $! fromSing (sing :: Sing max_count) of
     !max_count 
         | max_count < count -> fail $ "bounded_accum: requested count "
                                     ++ "(" ++ show count ++ ") "
@@ -141,20 +162,14 @@ bounded_accum _ !count !f !a = case toInt ( undefined :: max_count ) of
 -- XXX: rewrite point free
 {-# INLINE bounded_accum_ #-}
 bounded_accum_ :: forall tag max_count f_size total_size a .
-                  ( Nat max_count
-                  , total_size ~ Mul max_count f_size 
-                  , total_size ~ Add total_size D0
-                  ) => max_count
+                  ( total_size ~ (max_count * f_size)
+                  , SingI max_count
+                  ) => Sing max_count
                     -> Int
                     -> ( a -> StaticMemAction tag f_size a )
                     -> a 
                     -> StaticMemAction tag total_size ()
 bounded_accum_ _ !count !f !a = do
-    _ <- bounded_accum ( undefined :: max_count ) count f a
+    _ <- bounded_accum ( undefined :: Sing max_count ) count f a
     return ()
 
-{-
-infixr 1 <|>
-
-(<|>) :: 
--}
