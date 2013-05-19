@@ -1,7 +1,7 @@
 -- Copyright   :  (C) 2009 Corey O'Connor
 -- License     :  BSD-style (see the file LICENSE)
 name:               bind-marshal
-version:            0.1
+version:            0.2
 cabal-version:      >= 1.6
 author:             Corey O'Connor <coreyoconnor@gmail.com>
 maintainer:         Corey O'Connor <coreyoconnor@gmail.com>
@@ -12,7 +12,7 @@ license-file:       LICENSE
 synopsis:           Data marshaling library that uses type level equations to optimize buffering.
 description:        A (in development) high performance data marshaling layer for haskell. Uses a
                     pair of parameterized monads to represent: Data marshalling actions with 
-                    static buffering requirements (EG: Needs no more than 100 bytes available to
+                    static buffering requirements (EG: Requires no more than 100 bytes available to
                     succeed) ; Data marshalling actions that are a dynamic composition of actions
                     with static buffering requirements.
 tested-with:        GHC == 7.6.1
@@ -45,7 +45,6 @@ Library
     build-depends:      base >= 4.4.0,
                         unix >= 2.5.0,
                         mtl >= 2.0.0,
-                        numeric-prelude >= 0.2.0,
                         monads-tf >= 0.1.0,
                         transformers >= 0.2.0,
                         containers >= 0.4.0,
@@ -53,10 +52,8 @@ Library
                         random >= 1.0.0,
                         ghc-prim,
                         strict >= 0.3.0,
-                        bytestring >= 0.9.0,
-                        stm >= 2.2.0,
-                        -- used for the Bool type level rep. Can be removed.
-                        type-level-tf >= 0.2.1
+                        type-equality >= 0.1.1,
+                        bytestring >= 0.9.0
     exposed-modules:    Bind.Marshal.Action.Base
                         Bind.Marshal.Action.Dynamic
                         Bind.Marshal.Action.Monad.Static
