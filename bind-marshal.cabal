@@ -97,6 +97,7 @@ Library
     extensions:         TypeFamilies
                         DataKinds
                         TypeOperators
+                        PolyKinds
                         CPP
                         ForeignFunctionInterface
                         ScopedTypeVariables

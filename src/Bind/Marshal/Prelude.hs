@@ -16,7 +16,6 @@ module Bind.Marshal.Prelude ( module Bind.Marshal.Prelude
                             , module Data.String
                             , module Data.Word
                             , module GHC.TypeLits
-                            , module NumericPrelude.Numeric
                             , module System.IO
                             )
     where
@@ -49,8 +48,6 @@ import Data.Monoid
 import Data.String
 import Data.Word
 
-import NumericPrelude.Numeric
-
 import Foreign.C.Types ( CSize(..) )
 import Foreign.Ptr
 
@@ -59,7 +56,7 @@ import GHC.TypeLits hiding ( isZero )
 import System.IO
 
 -- use the standard ifThenElse for now. 
--- XXX: Add a version that handles static actions more optimaly.
+-- TODO: Add a version that handles static actions more optimaly.
 ifThenElse True   e1 _e2 = e1
 ifThenElse False _e1  e2 = e2
 

@@ -66,6 +66,6 @@ data Model tModel = Model
 --
 -- XXX: Verify this constraint fails when applied to a dynamic buffer sequence.
 --
-type family IsStaticModel model
+type family IsStaticModel model :: Bool
 type instance IsStaticModel (StaticModel size) = True
 

@@ -75,7 +75,6 @@ module Bind.Marshal.Control.Monad.Parameterized (
 	, mzero	
 
 	-- * Export common monads in this sugar
-	, module Control.Concurrent.STM
 	, module Control.Monad.Cont
 	, module Control.Monad.Cont.Class
 	, module Control.Monad.Error
@@ -120,7 +119,6 @@ import Data.Monoid
 import Prelude hiding (Monad,(>>=),(>>),return,fail,(=<<))
 import Data.Maybe (catMaybes)
 
-import Control.Concurrent.STM
 import Control.Monad
 	(mapM, mapM_, sequence, sequence_, forM, forM_, join, msum, filterM, mapAndUnzipM, zipWithM, zipWithM_,
 	foldM, foldM_, replicateM, replicateM_, guard, when, unless, liftM, liftM2, liftM3, liftM4, liftM5, ap)
@@ -256,10 +254,6 @@ instance Bind [] [] [] where (>>=) = (Old.>>=)
 instance MonadZero [] where mzeroM = Old.mzero
 instance MPlus [] [] [] where mplus = Old.mplus
 
-instance Return STM where returnM = Old.return
-instance Fail STM where fail = Old.fail
-instance Bind STM STM STM where (>>=) = (Old.>>=)
-
 instance Return IO where 
     {-# INLINE returnM #-}
     returnM = Old.return
@@ -342,9 +336,6 @@ instance Bind Maybe [] [] where
 
 instance Bind [] Maybe [] where
 	xs >>= f = catMaybes $ map f xs
-
-instance Bind STM IO IO where m >>= k = atomically m >>= k
-instance Bind IO STM IO where m >>= k = m >>= (atomically . k)
 
 instance Bind [] IO (ListT IO) where
 	xs >>= f = ListT (mapM f xs)
