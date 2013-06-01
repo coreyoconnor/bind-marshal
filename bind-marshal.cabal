@@ -96,8 +96,8 @@ Library
     hs-source-dirs:     src
     extensions:         TypeFamilies
                         DataKinds
-                        TypeOperators
                         PolyKinds
+                        TypeOperators
                         CPP
                         ForeignFunctionInterface
                         ScopedTypeVariables

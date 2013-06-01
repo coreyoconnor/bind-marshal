@@ -23,19 +23,9 @@ module Bind.Marshal.Prelude ( module Bind.Marshal.Prelude
 import Bind.Marshal.TypePrelude
 import Bind.Marshal.Control.Monad.Parameterized
 
-import Prelude ( ($)
-               , ($!)
-               , (.)
-               , undefined
-               , snd
-               , id
-               , const
-               , toEnum
-               , fromEnum
-               , Enum(..)
-               , Show(..)
-               , Ord(..)
-               )
+import Prelude hiding ( Monad(..)
+                      , (=<<)
+                      )
 
 import Data.Bits
 import Data.Bool

@@ -14,9 +14,7 @@ import GHC.Prim
 
 import System.IO
 
-data DesTag
-
-type DesBuffer = BufferRegion DesTag
+type DesBuffer = BufferRegion
 
 type DeserializeAction t = Addr# -> IO t
 

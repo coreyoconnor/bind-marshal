@@ -14,9 +14,7 @@ import System.IO
 
 import GHC.Prim
 
-data SerTag
-
-type SerBuffer = BufferRegion SerTag
+type SerBuffer = BufferRegion
 
 type SerializeAction t = t -> Addr# -> IO ()
 

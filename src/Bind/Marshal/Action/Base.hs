@@ -22,18 +22,18 @@ import GHC.Prim
 -- buffer requirement is the memory required by the marshaled data.
 -- XXX: All actions? Maybe easier to just have a StaticBufferReq that is only defined for static
 -- buffer actions.
-type family BufferReq action
+type family BufferReq (t :: k) :: Nat
 
 -- | All static memory actions act on a buffer region. 
 --
 -- The tag type variable differentiates buffers being serialized to versus deserialized from.
-data BufferRegion tag = BufferRegion 
+data BufferRegion = BufferRegion 
     { buffer_region_start :: {-# UNPACK #-} !BytePtr
     , buffer_region_size :: {-# UNPACK #-} !Size
     } 
 
 -- | returns the pointer to the end of the BufferRegion
-buffer_region_end :: BufferRegion tag -> BytePtr
+buffer_region_end :: BufferRegion -> BytePtr
 buffer_region_end (BufferRegion start size) = start `plusPtr` size
 
 {-# INLINE buffer_region_end #-}
@@ -41,14 +41,14 @@ buffer_region_end (BufferRegion start size) = start `plusPtr` size
 -- | Produces a new buffer region that skips the given number of bytes of the given buffer.
 --
 -- XXX: Really should be named drop_bytes instead of pop_bytes
-pop_bytes :: BufferRegion tag -> Size -> BufferRegion tag
+pop_bytes :: BufferRegion -> Size -> BufferRegion
 pop_bytes (BufferRegion start size) !to_pop 
     = BufferRegion (start `plusPtr` to_pop)
                    (size - to_pop)
 
 {-# INLINE pop_bytes #-}
 
-instance NFData (BufferRegion tag) where
+instance NFData BufferRegion where
     rnf (BufferRegion !start !size) = ()
 
 type Iter = Ptr Word8

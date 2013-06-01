@@ -27,14 +27,13 @@ import GHC.Prim
 
 import System.IO ( IO(..) )
 
-type StaticDesAction size a = StaticMemAction DesTag size a
+type StaticDesAction size a = StaticMemAction size a
 
 -- | des deserializes a value with type t from a buffer that has at least BufferReq t byte
 -- available.
 {-# INLINE des #-}
 des :: forall t . 
         ( CanDeserialize t
-        , Nat (BufferReq t)
         ) => StaticDesAction (BufferReq t) t
 des = case toInt (undefined :: (BufferReq t)) of
     I# type_size -> StaticMemAction 
@@ -56,7 +55,6 @@ skip_bytes = case toInt (undefined :: n ) of
 {-# INLINE apply_des_to_fixed_buffer #-}
 apply_des_to_fixed_buffer :: forall size out_type .
                               ( NFData out_type
-                              , Nat size
                               ) 
                               => StaticDesAction size
                                                  out_type
