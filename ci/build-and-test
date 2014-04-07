@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+source /etc/profile
+
+function init-sandbox() {
+  cabal sandbox init
+}
+
+function build() {
+  cabal install --enable-tests --only-dependencies --force-reinstalls
+}
+
+function rebuild() {
+  rm -rf dist
+  build
+}
+
+function rebuild-including-deps() {
+  rm -rf .cabal-sandbox
+  rm -rf cabal.sandbox.config
+  init-sandbox
+  build
+}
+
+set -ex
+
+cd bind-marshal
+if [[ ! -f cabal.sandbox.config ]] ; then
+  init-sandbox
+fi
+
+build || rebuild || rebuild-including-deps
+cabal test
